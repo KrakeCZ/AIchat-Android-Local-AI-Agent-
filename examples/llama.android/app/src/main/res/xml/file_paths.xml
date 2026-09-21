@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Mapuje root getExternalFilesDir(null) a exports -->
+    <external-files-path name="external_files" path="." />
+    <external-files-path name="my_exports" path="exports" />
+    <external-files-path name="app_registry" path="." />
+    <!-- Mapuje interní a externí cache i files pro sdílení generovaných videí a fotek -->
+    <external-cache-path name="external_cache" path="." />
+    <files-path name="internal_files" path="." />
+    <cache-path name="internal_cache" path="." />
+    <external-path name="external_storage" path="." />
+</paths>
+

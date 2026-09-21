@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#1E1E1E"
+    android:padding="16dp">
+
+    <!-- Záhlaví -->
+    <TextView
+        android:id="@+id/tvSheetTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Styl titulků"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Presety -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Preset"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp"
+        android:layout_marginBottom="4dp" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginBottom="16dp">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupPreset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleSelection="true" />
+    </HorizontalScrollView>
+
+    <!-- Velikost textu -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Velikost textu"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp">
+
+        <SeekBar
+            android:id="@+id/seekbarTextSize"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:min="12"
+            android:max="72"
+            android:progress="36"
+            android:progressTint="#2196F3"
+            android:thumbTint="#2196F3" />
+
+        <TextView
+            android:id="@+id/tvTextSizeValue"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:text="36sp"
+            android:textColor="@android:color/white"
+            android:textAlignment="center" />
+    </LinearLayout>
+
+    <!-- Barva textu (základní výběr) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Barva textu"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp"
+        android:layout_marginBottom="4dp" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:layout_marginBottom="12dp">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupTextColor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleSelection="true" />
+    </HorizontalScrollView>
+
+    <!-- Obrys -->
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switchStroke"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Obrys textu"
+        android:textColor="@android:color/white"
+        android:checked="true"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Pozadí -->
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switchBackground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pozadí za textem"
+        android:textColor="@android:color/white"
+        android:checked="false"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Animace -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Animace"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp"
+        android:layout_marginBottom="4dp" />
+
+    <Spinner
+        android:id="@+id/spinnerAnimation"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="#2A2A2A"
+        android:padding="8dp"
+        android:layout_marginBottom="12dp" />
+
+    <!-- CAPS + Letter Spacing -->
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switchAllCaps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="VELKÁ PÍSMENA"
+        android:textColor="@android:color/white"
+        android:checked="false"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Tlačítko Potvrdit -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnApplyStyle"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Použít styl"
+        android:textColor="@android:color/white"
+        app:backgroundTint="#2196F3"
+        app:cornerRadius="12dp" />
+
+</LinearLayout>

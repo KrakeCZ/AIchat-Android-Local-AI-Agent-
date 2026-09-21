@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="kv_cache_names">
+        <item>F16 (Uncompressed - Max Quality)</item>
+        <item>Q8_0 (Balanced - Recommended)</item>
+        <item>Q6_K (High Quality - Near F16)</item>
+        <item>Q5_K (Better than Q5_0)</item>
+        <item>Q4_K (Gold Standard)</item>
+        <item>Q5_1 (Legacy High)</item>
+        <item>Q5_0 (Legacy Mid)</item>
+        <item>Q4_1 (Legacy)</item>
+        <item>Q4_0 (Legacy Fast)</item>
+        <item>IQ4_NL (Non-Linear - High precision low RAM)</item>
+        <item>IQ3_M (Smart 3-bit - Best Low RAM)</item>
+        <item>IQ3_S (Smaller 3-bit)</item>
+        <item>IQ2_XS (2.3 bpw - Very Low RAM)</item>
+        <item>IQ2_XXS (2.0 bpw - Extreme)</item>
+        <item>IQ1_S (1.56 bpw - Experimental / Crazy)</item>
+    </string-array>
+
+    <string-array name="kv_cache_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+    </string-array>
+
+    <string-array name="batch_size_values">
+        <item>8</item>
+        <item>16</item>
+        <item>20</item>
+        <item>24</item>
+        <item>28</item>
+        <item>32</item>
+        <item>38</item>
+        <item>48</item>
+        <item>64</item>
+        <item>72</item>
+        <item>94</item>
+        <item>128</item>
+        <item>164</item>
+        <item>192</item>
+        <item>256</item>
+        <item>320</item>
+        <item>480</item>
+        <item>512</item>
+        <item>640</item>
+        <item>720</item>
+        <item>1024</item>
+        <item>1440</item>
+        <item>2048</item>
+        <item>4096</item>
+    </string-array>
+</resources>

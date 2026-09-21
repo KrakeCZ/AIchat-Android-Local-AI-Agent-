@@ -1,0 +1,85 @@
+{
+  "buildFiles": [
+    "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\lib\\src\\main\\cpp\\whisper.cpp\\CMakeLists.txt",
+    "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\lib\\src\\main\\cpp\\whisper.cpp\\ggml\\CMakeLists.txt",
+    "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\lib\\src\\main\\cpp\\whisper.cpp\\ggml\\src\\CMakeLists.txt",
+    "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\lib\\src\\main\\cpp\\whisper.cpp\\ggml\\src\\ggml-cpu\\CMakeLists.txt",
+    "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\lib\\src\\main\\cpp\\whisper.cpp\\ggml\\src\\ggml-vulkan\\CMakeLists.txt",
+    "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\lib\\src\\main\\cpp\\whisper.cpp\\src\\CMakeLists.txt",
+    "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\whisper\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\x\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-v",
+      "-C",
+      "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\whisper\\.cxx\\Release\\3j46102l\\arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\x\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-v",
+    "-C",
+    "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\whisper\\.cxx\\Release\\3j46102l\\arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "ggml::@6213cdca6a34c64fc589": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "ggml",
+      "output": "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\whisper\\.cxx\\Release\\3j46102l\\arm64-v8a\\build-whisper\\ggml\\src\\libggml.a"
+    },
+    "ggml-base::@6213cdca6a34c64fc589": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "ggml-base",
+      "output": "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\whisper\\.cxx\\Release\\3j46102l\\arm64-v8a\\build-whisper\\ggml\\src\\libggml-base.a"
+    },
+    "ggml-cpu::@6213cdca6a34c64fc589": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "ggml-cpu",
+      "output": "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\whisper\\.cxx\\Release\\3j46102l\\arm64-v8a\\build-whisper\\ggml\\src\\libggml-cpu.a"
+    },
+    "ggml-vulkan::@af61c0246c614116d586": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "ggml-vulkan",
+      "output": "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\whisper\\.cxx\\Release\\3j46102l\\arm64-v8a\\build-whisper\\ggml\\src\\ggml-vulkan\\libggml-vulkan.a"
+    },
+    "vulkan-shaders-gen::@af61c0246c614116d586": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "vulkan-shaders-gen"
+    },
+    "whisper::@bb86e6723354802c3e57": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "whisper",
+      "output": "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\whisper\\.cxx\\Release\\3j46102l\\arm64-v8a\\build-whisper\\src\\libwhisper.a"
+    },
+    "whisper-jni::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "arm64-v8a",
+      "artifactName": "whisper-jni",
+      "output": "C:\\SS24_V3_OK_preAgent_\\examples\\llama.android\\whisper\\build\\intermediates\\cxx\\Release\\3j46102l\\obj\\arm64-v8a\\libwhisper-jni.so",
+      "runtimeFiles": [
+        "C:\\Users\\x\\AppData\\Local\\Android\\Sdk\\ndk\\29.0.13846066\\toolchains\\llvm\\prebuilt\\windows-x86_64\\lib\\clang\\21\\lib\\linux\\aarch64\\libomp.so"
+      ]
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "C:\\Users\\x\\AppData\\Local\\Android\\Sdk\\ndk\\29.0.13846066\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe",
+      "cppCompilerExecutable": "C:\\Users\\x\\AppData\\Local\\Android\\Sdk\\ndk\\29.0.13846066\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [
+    "c"
+  ],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

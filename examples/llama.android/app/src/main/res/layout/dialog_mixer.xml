@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#121212"
+    android:padding="24dp">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:background="#333333"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🎛️ Mixážní Pult"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Gain Sekce -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Gain (Zisk) - Zesílení vstupu"
+        android:textColor="#00BCD4"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Mic Gain -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+        
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="Mikrofon"
+            android:textColor="#BBBBBB"
+            android:textSize="12sp" />
+            
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider_mic_gain"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:valueFrom="-6.0"
+            android:valueTo="12.0"
+            android:stepSize="0.5"
+            android:value="1.0"
+            app:thumbTint="#00BCD4"
+            app:trackColorActive="#00BCD4"
+            app:trackColorInactive="#333333" />
+            
+        <TextView
+            android:id="@+id/tv_mic_gain_val"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="1.0x"
+            android:gravity="end"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- System Audio Gain -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+        
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="Systém"
+            android:textColor="#BBBBBB"
+            android:textSize="12sp" />
+            
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider_sys_gain"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:valueFrom="-6.0"
+            android:valueTo="12.0"
+            android:stepSize="0.5"
+            android:value="1.0"
+            app:thumbTint="#FF9800"
+            app:trackColorActive="#FF9800"
+            app:trackColorInactive="#333333" />
+            
+        <TextView
+            android:id="@+id/tv_sys_gain_val"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:text="1.0x"
+            android:gravity="end"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#222222"
+        android:layout_marginBottom="16dp" />
+
+    <!-- HW Parametric EQ Sekce -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="4dp">
+        
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Hardwarový Ekvalizér (DSP)"
+            android:textColor="#4CAF50"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+            
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_eq_enable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            app:thumbTint="#4CAF50"
+            app:trackTint="#1B5E20" />
+    </LinearLayout>
+    
+    <TextView
+        android:id="@+id/tv_eq_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Frekvence jsou pevně dané audio čipem zařízení."
+        android:textColor="#888888"
+        android:textSize="11sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- EQ Bands Container -->
+    <LinearLayout
+        android:id="@+id/layout_eq_bands"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
+        <!-- Zde budou dynamicky vloženy slidery z Kotlinu -->
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_close_mixer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Zavřít Mixážní Pult"
+        android:backgroundTint="#333333"
+        android:textColor="#FFFFFF" />
+
+</LinearLayout>

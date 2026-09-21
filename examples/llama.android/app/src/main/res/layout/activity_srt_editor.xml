@@ -1,0 +1,864 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="#000000">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#0D0D0D">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_srt_editor"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="📝 SRT Editor — Přepis &amp; Titulky"
+            app:titleTextColor="@android:color/white"
+            app:navigationIcon="@android:drawable/ic_menu_revert" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <!-- ═══ TLAČÍTKO PRO NOVÝ LIVE EDITOR ═══ -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_open_live_editor"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="12dp"
+                android:text="✨ Spustit LiveEditor (Video + Titulky)"
+                android:backgroundTint="#2196F3"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                app:cornerRadius="12dp" />
+
+            <!-- ═══ PANEL 1: INFO + PŘEHRÁVAČ ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="#0D0D0D"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <!-- Thumbnail + metadata -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <FrameLayout
+                            android:layout_width="160dp"
+                            android:layout_height="90dp"
+                            android:background="#1A4CAF50">
+                            
+                            <!-- LibVLC 3.7.0: SurfaceView pro IVLCVout renderer
+                                 VideoView NELZE pouzit pro LibVLC — nepodporuje setSurface().
+                                 Viditelnost rizena v kodu: gone pokud switch_video_preview=false -->
+                            <SurfaceView
+                                android:id="@+id/surface_player"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:visibility="gone" />
+
+                            <ImageView
+                                android:id="@+id/iv_media_thumbnail"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="centerCrop"
+                                android:src="@android:drawable/ic_menu_gallery"
+                                app:tint="#4CAF50"
+                                android:padding="16dp" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="12dp">
+
+                            <TextView
+                                android:id="@+id/tv_media_filename"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Žádné médium"
+                                android:textColor="#FFFFFF"
+                                android:textSize="14sp"
+                                android:fontFamily="sans-serif-medium"
+                                android:maxLines="2"
+                                android:ellipsize="end" />
+
+                            <TextView
+                                android:id="@+id/tv_media_meta"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Délka: — · Rozlišení: — · Velikost: —"
+                                android:textColor="#888888"
+                                android:textSize="11sp"
+                                android:layout_marginTop="4dp" />
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_pick_media"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📁"
+                            android:textSize="18sp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#4CAF50"
+                            android:textColor="#4CAF50"
+                            android:layout_marginStart="8dp" />
+                    </LinearLayout>
+
+                    <!-- HW Resource Toggle pro nahled -->
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_video_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Zivy nahled videa (Vypnuto setri RAM)"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp"
+                        app:useMaterialThemeColors="false"
+                        app:thumbTint="#4CAF50"
+                        app:trackTint="#1B5E20"
+                        android:layout_marginTop="8dp" />
+
+                    <!-- Audio stopa — LibVLC: viditelne jen kdyz media ma >1 audio stopu -->
+                    <LinearLayout
+                        android:id="@+id/layout_audio_track"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="6dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Audio stopa: "
+                            android:textColor="#AAAAAA"
+                            android:textSize="12sp" />
+
+                        <Spinner
+                            android:id="@+id/spinner_audio_track"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:background="#1A4CAF50"
+                            android:paddingStart="8dp" />
+                    </LinearLayout>
+
+                    <!-- SPU (embedded titulky) detekce info -->
+                    <TextView
+                        android:id="@+id/tv_spu_tracks_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="#FF9800"
+                        android:textSize="11sp"
+                        android:layout_marginTop="2dp"
+                        android:visibility="gone" />
+
+                    <!-- SeekBar přehrávače -->
+                    <SeekBar
+                        android:id="@+id/seekbar_player"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:progressTint="#4CAF50"
+                        android:thumbTint="#4CAF50" />
+
+                    <!-- Čas + ovládání -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="4dp">
+
+                        <TextView
+                            android:id="@+id/tv_player_position"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="0:00"
+                            android:textColor="#888888"
+                            android:textSize="12sp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_play_pause"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="▶"
+                            android:textSize="16sp"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#4CAF50"
+                            android:textColor="#4CAF50" />
+
+                        <TextView
+                            android:id="@+id/tv_player_duration"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="0:00"
+                            android:textColor="#888888"
+                            android:textSize="12sp"
+                            android:gravity="end" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══ PANEL 2: STT ENGINE + PŘEPIS ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="#0D0D0D"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚙️ Přepis Engine"
+                        android:textColor="#4CAF50"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginBottom="8dp" />
+
+                    <Spinner
+                        android:id="@+id/spinner_stt_engine"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="#1A4CAF50"
+                        android:paddingStart="12dp" />
+
+                    <!-- ── Segmentace bloků ── -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="✂️ Segmentace bloků"
+                        android:textColor="#4CAF50"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="4dp" />
+
+                    <Spinner
+                        android:id="@+id/spinner_segmentation_mode"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:background="#1A4CAF50"
+                        android:paddingStart="12dp" />
+
+                    <!-- Max slov na blok (1–10, viditelné jen pro A a B) -->
+                    <LinearLayout
+                        android:id="@+id/layout_max_words"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="6dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Max slov / blok:"
+                            android:textColor="#AAAAAA"
+                            android:textSize="12sp" />
+
+                        <SeekBar
+                            android:id="@+id/seekbar_max_words"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:max="9"
+                            android:progress="6"
+                            android:progressTint="#4CAF50"
+                            android:thumbTint="#4CAF50" />
+
+                        <TextView
+                            android:id="@+id/tv_max_words_value"
+                            android:layout_width="28dp"
+                            android:layout_height="wrap_content"
+                            android:text="7"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13sp"
+                            android:gravity="center"
+                            android:layout_marginStart="6dp" />
+                    </LinearLayout>
+
+                    <!-- Word Timestamps toggle -->
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_word_timestamps"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚡ Word Timestamps (vyžaduje kompatibilní model)"
+                        android:textColor="#CCCCCC"
+                        android:textSize="12sp"
+                        app:useMaterialThemeColors="false"
+                        app:thumbTint="#FF9800"
+                        app:trackTint="#7F4400"
+                        android:layout_marginTop="6dp" />
+
+                    <!-- Varování: model nepodporuje word timestamps -->
+                    <TextView
+                        android:id="@+id/tv_word_ts_warning"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚠️ Aktivní model nepodporuje word timestamps — bude použit Mód B (interpunkce)"
+                        android:textColor="#FF9800"
+                        android:textSize="11sp"
+                        android:layout_marginTop="2dp"
+                        android:visibility="gone" />
+
+
+                    <!-- ── Výkon přepisu (Per-session, nezávislé na globálním nastavení agenta) ── -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚡ Výkon přepisu (per-session)"
+                        android:textColor="#4CAF50"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="4dp" />
+
+                    <!-- Thread slider (1–8) — lokální per-session, nesdílí se s Agentem -->
+                    <LinearLayout
+                        android:id="@+id/layout_srt_threads"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Vlákna:"
+                            android:textColor="#AAAAAA"
+                            android:textSize="12sp" />
+
+                        <SeekBar
+                            android:id="@+id/seekbar_srt_threads"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2"
+                            android:max="7"
+                            android:progress="3"
+                            android:progressTint="#FF9800"
+                            android:thumbTint="#FF9800" />
+
+                        <TextView
+                            android:id="@+id/tv_srt_threads_value"
+                            android:layout_width="28dp"
+                            android:layout_height="wrap_content"
+                            android:text="4"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13sp"
+                            android:gravity="center"
+                            android:layout_marginStart="6dp" />
+                    </LinearLayout>
+
+
+                    <!-- ThermalGuard toggle + headroom indikátor (P2) -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="4dp">
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switch_thermal_guard"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="🌡️ ThermalGuard"
+                            android:checked="true"
+                            android:textColor="#CCCCCC"
+                            android:textSize="12sp"
+                            app:useMaterialThemeColors="false"
+                            app:thumbTint="#FF5722"
+                            app:trackTint="#7F2B00" />
+
+                        <!-- Aktuální thermal headroom — aktualizuje se při startu přepisu -->
+                        <TextView
+                            android:id="@+id/tv_thermal_headroom"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🌡️ --"
+                            android:textColor="#888888"
+                            android:textSize="11sp"
+                            android:layout_marginStart="6dp"
+                            android:fontFamily="monospace" />
+                    </LinearLayout>
+
+
+                    <!-- ── Priority vlákna per-session (Fáze B) ── -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚡ Priorita CPU vlákna (per-session)"
+                        android:textColor="#4CAF50"
+                        android:textSize="12sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="4dp" />
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipgroup_priority_srt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true"
+                        app:selectionRequired="true"
+                        android:layout_marginBottom="2dp">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_srt_priority_urgent"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔥 Urgentní"
+                            android:textSize="11sp" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_srt_priority_default"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⚡ Výchozí"
+                            android:textSize="11sp"
+                            android:checked="true" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_srt_priority_bg"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🌙 Pozadí"
+                            android:textSize="11sp" />
+                    </com.google.android.material.chip.ChipGroup>
+
+                    <!-- Varování pro URGENT na slabém HW -->
+                    <TextView
+                        android:id="@+id/tv_srt_priority_warning"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="⚠️ Urgentní: Max CPU freq. Vhodné pro výkonné HW (S24U+). Na slabším HW může způsobit lag UI."
+                        android:textColor="#FF9800"
+                        android:textSize="11sp"
+                        android:layout_marginBottom="4dp"
+                        android:visibility="gone" />
+
+                    <!-- Přepis Progress -->
+                    <ProgressBar
+
+                        android:id="@+id/progress_transcription"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="10dp"
+                        android:progressTint="#4CAF50"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tv_transcription_status"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="#888888"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="10dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_start_transcription"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="▶ Spustit přepis"
+                            android:backgroundTint="#1B5E20"
+                            android:textColor="#FFFFFF"
+                            android:layout_marginEnd="6dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_cancel_transcription"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="✕"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#F44336"
+                            android:textColor="#F44336"
+                            android:enabled="false" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══ PANEL 3: SRT BLOKY ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="#0D0D0D"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="📋 SRT Bloky"
+                            android:textColor="#4CAF50"
+                            android:textSize="13sp"
+                            android:fontFamily="sans-serif-medium" />
+
+                        <!-- Import existujicich .srt/.vtt pro re-editaci -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_import_srt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:text="📂 Import"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#00BCD4"
+                            android:textColor="#00BCD4"
+                            android:textSize="11sp"
+                            android:layout_marginEnd="6dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_add_block"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:text="+ Přidat"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#4CAF50"
+                            android:textColor="#4CAF50"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_srt_blocks"
+                        android:layout_width="match_parent"
+                        android:layout_height="400dp"
+                        android:layout_marginTop="8dp"
+                        android:nestedScrollingEnabled="true" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══ PANEL 3.5: GLOBÁLNÍ OPERACE ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:cardBackgroundColor="#0D0D0D"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="🛠️ Globální operace"
+                        android:textColor="#9C27B0"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginBottom="8dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Posun vsech bloku o +/- ms -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_shift_all"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="⏱ Posun"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#9C27B0"
+                            android:textColor="#9C27B0"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="6dp" />
+
+                        <!-- Automaticka oprava prekryvu a smazani prazdnych bloku -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_auto_fix"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="🔧 Auto-Fix"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#9C27B0"
+                            android:textColor="#9C27B0"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="6dp" />
+
+                        <!-- Najit a nahradit text ve vsech blocich -->
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_find_replace"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="🔍 Najít"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#9C27B0"
+                            android:textColor="#9C27B0"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ═══ PANEL 4: EXPORT ═══ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#0D0D0D"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <!-- Řádek 1: SRT, VTT, Sdílet -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_export_srt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="💾 SRT"
+                            android:backgroundTint="#1B5E20"
+                            android:textColor="#FFFFFF"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="6dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_export_vtt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="🌐 VTT"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#2196F3"
+                            android:textColor="#2196F3"
+                            android:textSize="12sp"
+                            android:layout_marginEnd="6dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_share_srt"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="📤 Sdílet"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            app:strokeColor="#FF9800"
+                            android:textColor="#FF9800"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Řádek 2: ASS/SSA export (karaoke/styling, pro LibVLC rendering) -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_export_ass"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="💎 Export ASS / SSA  (Karaoke + Styling — pro VLC / Aegisub)"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="#FFD600"
+                        android:textColor="#FFD600"
+                        android:textSize="11sp"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        <!-- ═══ PANEL 5: AI NLP ANALÝZA TRANSKRIPTU ═══ -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#0D0D0D"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🤖 AI Analýza transkriptu"
+                    android:textColor="#673AB7"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Řádek 1: Shrnutí + Korektura + Překlad -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_nlp_summarize_srt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🧠 Shrnutí"
+                        android:backgroundTint="#311B92"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:layout_marginEnd="4dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_nlp_proofread_srt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="✏️ Korektura"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="#673AB7"
+                        android:textColor="#673AB7"
+                        android:textSize="11sp"
+                        android:layout_marginEnd="4dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_nlp_translate_srt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🌐 Překlad"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="#2196F3"
+                        android:textColor="#2196F3"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- Řádek 2: Přepis + Sentiment -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_nlp_rewrite_srt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="✍️ Přepis"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="#FF9800"
+                        android:textColor="#FF9800"
+                        android:textSize="11sp"
+                        android:layout_marginEnd="4dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_nlp_sentiment_srt"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="💜 Sentiment"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="#E91E63"
+                        android:textColor="#E91E63"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- NLP Progress bar -->
+                <ProgressBar
+                    android:id="@+id/progress_nlp_srt"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:indeterminate="true"
+                    android:progressTint="#673AB7"
+                    android:visibility="gone"
+                    android:layout_marginBottom="6dp" />
+
+                <!-- NLP výsledek — scrollovatelný (dlouhé sumarizace) -->
+                <TextView
+                    android:id="@+id/tv_nlp_result_srt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="60dp"
+                    android:text="⬆️ Spusť přepis a pak zvol AI operaci"
+                    android:textColor="#AAAAAA"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:background="#0A673AB7"
+                    android:padding="10dp"
+                    android:scrollbars="vertical"
+                    android:focusable="true" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

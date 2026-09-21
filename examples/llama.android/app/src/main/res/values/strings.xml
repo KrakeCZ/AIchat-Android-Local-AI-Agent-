@@ -1,0 +1,317 @@
+<resources>
+    <string name="app_name">AiChat</string>
+    <string name="action_load_model">Načíst GGUF</string>
+    <string name="action_delete">Smazat</string>
+
+    <!-- Info messages -->
+    <string name="info_parsing_gguf">Analyzuji: %s</string>
+    <string name="info_copying_file">Kopírování modelu……</string>
+    <string name="info_loading_model">Načítání modelu…</string>
+    <string name="info_input_empty">Zpráva je prázdná</string>
+    <string name="info_new_chat_started">Nová konverzace zahájena</string>
+    <string name="info_generation_params_log">Gen Params: T=%1$.2f, K=%2$d, P=%3$.2f</string>
+    <string name="info_speed_placeholder">..</string>
+    <string name="info_speed_format">%1$.2f t/s</string>
+    <string name="info_thought_hidden">\\n(-myšlenky skryté-)\\n</string>
+    <string name="info_thinking">\\n(🧠…přemýšlím…)</string>
+
+    <!-- Settings Tabs -->
+    <string name="tab_general">Obecné</string>
+    <string name="tab_display">Vzhled</string>
+    <string name="tab_style">Styl</string>
+    <string name="tab_sampling">Sampling</string>
+    <string name="tab_advanced">Rozšířené</string>
+
+    <!-- General Settings -->
+    <string name="lbl_system_message">System Prompt</string>
+    <string name="hint_system_message">Instrukce pro AI…</string>
+    <string name="desc_system_message">Definuje chování modelu (např. "Jsi asistent…").</string>
+    <string name="chk_show_system_message">Zobrazit System Prompt v chatu</string>
+    <string name="lbl_max_import_size">Max File Import Size (Bytes)</string>
+    <string name="desc_max_import_size">Limit pro vkládání souborů do chatu. (Default: 512 KB)</string>
+
+    <!-- Display Settings -->
+    <string name="chk_show_stats">Zobrazit rychlost (t/s)</string>
+    <string name="desc_show_stats">Ukáže rychlost generování tokenů.</string>
+
+    <string name="chk_show_token_count">Počet tokenů</string>
+    <string name="desc_show_token_count">Zobrazit celkový počet vygenerovaných tokenů.</string>
+    <string name="chk_show_gen_time">Čas generování</string>
+    <string name="desc_show_gen_time">Zobrazit celkovou dobu generování.</string>
+    <string name="stats_tokens_placeholder">Tokenů: 0</string>
+    <string name="stats_time_placeholder">Čas: 0.0s</string>
+    <string name="stats_tokens_format">Tokenů: %1$d</string>
+    <string name="stats_time_format">Čas: %1$.1fs</string>
+    <string name="chk_show_thoughts">Zobrazit "myšlenky" (DeepSeek)</string>
+    <string name="desc_show_thoughts">Zobrazí obsah mezi značkami &lt;think&gt;.</string>
+    <string name="chk_keep_stats">Ponechat statistiky</string>
+    <string name="desc_keep_stats">Nerestartuje počítadlo po odeslání zprávy.</string>
+    <string name="chk_render_markdown">Renderovat Markdown</string>
+    <string name="desc_render_markdown">Formátování textu (tučné, kurzíva, kód).</string>
+    <string name="chk_disable_scroll">Vypnout auto-scroll</string>
+    <string name="desc_disable_scroll">Chat nebude automatisch rolovat dolů.</string>
+    <string name="chk_always_sidebar">Vždy zobrazit postranní panel</string>
+    <string name="desc_always_sidebar">Vhodné pro tablety (Split Screen).</string>
+    <string name="chk_auto_sidebar">Auto-zobrazit panel při startu</string>
+    <string name="desc_auto_sidebar">Otevře menu po startu aplikace.</string>
+    <string name="chk_bubble_copy">Tlačítko Kopírovat</string>
+    <string name="desc_bubble_copy">Zobrazí ikonu pro zkopírování celé zprávy.</string>
+    <string name="chk_background_gen">Běh na pozadí</string>
+    <string name="desc_background_gen">Generování bude pokračovat i po opuštění aplikace.</string>
+    <string name="chk_hide_status_bar">Fullscreen Mode (Skrýt Status Bar)</string>
+    <string name="desc_hide_status_bar">Skryje horní lištu (baterie, čas) pro maximální prostor.</string>
+
+    <!-- Style / Appearance Settings -->
+    <string name="cat_appearance">Vzhled Rozhraní</string>
+
+    <!-- Advanced / Performance Settings -->
+    <string name="cat_performance">Výkon a Paměť (Advanced)</string>
+    <string name="lbl_kv_cache">KV Cache Quantization</string>
+    <string name="desc_kv_cache">Sníží spotřebu RAM za cenu přesnosti (Q8_0 doporučeno).</string>
+    <string name="chk_use_mmap">Použít MMAP (Memory Mapping)</string>
+    <string name="desc_use_mmap">Nechte zapnuté. Vypnutí načte celý model do RAM (hrozí pád).</string>
+
+    <!-- NEW STRINGS FOR CONTEXT, BATCH, FLASH ATTN -->
+    <string name="lbl_context_size">Context Size (n_ctx)</string>
+    <string name="desc_context_size">Velikost kontextového okna (0 = Auto). Vyšší = více RAM.</string>
+    <string name="lbl_batch_size">Batch Size (n_batch)</string>
+    <string name="desc_batch_size">Počet tokenů zpracovaných najednou. 512 je dobrý start.</string>
+    <string name="chk_flash_attn">Flash Attention</string>
+    <string name="desc_flash_attn">Optimalizace paměti a rychlosti. Doporučeno zapnout.</string>
+    <string name="chk_ignore_eos">Ignorovat EOS (Infinite Gen)</string>
+    <string name="desc_ignore_eos">Model bude generovat dokud nedosáhne limitu délky (ignoruje stop značky).</string>
+    <string name="chk_no_perf">Disable Perf Metrics</string>
+    <string name="desc_no_perf">Nezaznamenávat časování (mírně zrychlí běh).</string>
+    <string name="chk_timing_per_token">Timing Per Token</string>
+    <string name="desc_timing_per_token">Měřit čas pro každý jednotlivý token (pro debug).</string>
+
+    <!-- Voice Services Settings -->
+    <string name="cat_voice">Hlasové služby</string>
+    <string name="chk_enable_tts">Povolit TTS (Převod textu na řeč)</string>
+    <string name="desc_enable_tts">Umožňuje aplikaci předčítat odpovědi AI.</string>
+
+    <!-- Sampling Settings -->
+    <string name="lbl_temp">Temperature</string>
+    <string name="lbl_dyn_temp_range">Dyn. Temp Range</string>
+    <string name="lbl_dyn_temp_exp">Dyn. Temp Exponent</string>
+    <string name="lbl_top_k">Top K</string>
+    <string name="lbl_top_p">Top P</string>
+    <string name="lbl_min_p">Min P</string>
+    <string name="lbl_xtc_prob">XTC Probability</string>
+    <string name="lbl_xtc_thresh">XTC Threshold</string>
+    <string name="lbl_typical_p">Typical P</string>
+    <string name="lbl_max_tokens">Max Tokens</string>
+    <string name="lbl_samplers">Samplers Sequence</string>
+    <string name="chk_backend_sampling">Backend Sampling (Native)</string>
+    <string name="desc_backend_sampling">Použít C++ implementaci samplerů.</string>
+
+    <string name="lbl_mirostat_mode">Mirostat Mode</string>
+    <string name="desc_mirostat_mode">0=Disabled, 1=Mirostat, 2=Mirostat 2.0</string>
+    <string name="lbl_mirostat_tau">Mirostat Tau</string>
+    <string name="desc_mirostat_tau">Target entropy (Default: 5.0)</string>
+    <string name="lbl_mirostat_eta">Mirostat Eta</string>
+    <string name="desc_mirostat_eta">Learning rate (Default: 0.1)</string>
+
+    <string-array name="mirostat_options">
+        <item>0 - Disabled</item>
+        <item>1 - Mirostat v1</item>
+        <item>2 - Mirostat v2.0</item>
+    </string-array>
+
+    <!-- Buttons -->
+    <string name="btn_save">Uložit</string>
+    <string name="btn_reset">Reset</string>
+    <string name="msg_saved">Uloženo</string>
+    <string name="msg_reset">Resetováno</string>
+    <string name="msg_error">Chyba ukládání</string>
+    <string name="msg_copied">Zpráva zkopírována</string>
+
+    <!-- activity_main.xml strings -->
+    <string name="gguf_metadata_placeholder">Zde se zobrazí metadata vybraného GGUF modelu.</string>
+    <string name="initial_speed_text">Rychlost: 0.0 t/s</string>
+    <string name="user_input_hint_model_picked">Napište zprávu..</string>
+    <string name="user_input_hint_no_model">Nejprve vyberte GGUF model k importu.</string>
+    <string name="cd_mic_button">Hlasový vstup</string>
+    <string name="cd_send_button">Odeslat</string>
+    <string name="action_speak">Přečíst zprávu</string>
+
+    <!-- toolbar_menu.xml strings -->
+    <string name="menu_load_model">Load Model</string>
+    <string name="menu_delete_chat">Smazat chat</string>
+
+    <!-- Added by Auto-Fix -->
+    <string name="hint_ready_to_chat">Type and send a message!</string>
+
+    <!-- New Strings from Warning Fix -->
+    <string name="status_error_prefix">Error: %1$s</string>
+    <string name="status_loading_named_model">Loading: %1$s……</string>
+    <string name="status_loading_model">Loading model……</string>
+    <string name="status_importing">Loading/Importing…</string>
+    <string name="dialog_select_model">Vybrat Model</string>
+    <string name="dialog_no_models">Žádné stažené modely. Importujte nový.</string>
+    <string name="dialog_import_new">Importovat Nový</string>
+    <string name="dialog_delete_model">Smazat Model</string>
+    <string name="dialog_cancel">Zrušit</string>
+    <string name="dialog_back">Zpět</string>
+    <string name="msg_model_deleted">Model smazán</string>
+    <string name="msg_import_wait">Importing model… Please wait.</string>
+    <string name="msg_import_failed">Import Failed: %1$s</string>
+    <string name="msg_load_success">Model loaded from Storage!</string>
+    <string name="msg_generation_stopped">Generování zastaveno</string>
+    <string name="msg_delete_conversation_title">Smazat konverzaci?</string>
+    <string name="msg_delete_conversation_body">Tato akce je nevratná.</string>
+    <string name="action_delete_confirm">Smazat</string>
+    <string name="menu_manage_models">Spravovat modely…</string>
+    <string name="msg_wait_operation">Prosím čekejte na dokončení operace.</string>
+    <string name="status_resetting_context">Resetting context.</string>
+    <string name="status_model_in_ram">Model připraven v RAM</string>
+
+    <!-- Model Info Dialog Strings -->
+    <string name="model_info_title">Model Information</string>
+    <string name="model_info_subtitle">Current model details and capabilities</string>
+    <string name="lbl_chat_template">Chat Template</string>
+    <string name="lbl_template_placeholder">{ template }</string>
+    <string name="desc_close">Zavřít</string>
+    <string name="lbl_label">Label</string>
+    <string name="lbl_value">Value</string>
+    <string name="msg_copied_to_clipboard">Copied to clipboard</string>
+
+    <!-- Chat Style Settings -->
+    <string name="lbl_chat_style">Styl Chat Bublin</string>
+    <string name="desc_chat_style">Vyberte vzhled chat zpráv (OEM, retro terminál 90\'s nebo moderní terminál).</string>
+    <string name="chat_style_oem">OEM - Klasické Bubliny</string>
+    <string name="chat_style_terminal90s">Terminal 90\'s - Retro</string>
+    <string name="chat_style_modern_terminal">Modern Terminal</string>
+
+    <string-array name="chat_style_options">
+        <item>OEM - Klasické Bubliny</item>
+        <item>Terminal 90\'s - Retro</item>
+        <item>Modern Terminal</item>
+    </string-array>
+
+    <!-- Prism Tab -->
+    <string name="tab_prism">Prism</string>
+
+    <!-- Markdown Features Category -->
+    <string name="cat_markdown_features">Markdown Funkce</string>
+
+    <!-- Markdown Plugin Checkboxes -->
+    <string name="chk_markdown_tables">Tables (Tabulky)</string>
+    <string name="desc_markdown_tables">Renderování markdown tabulek (GitHub Flavored Markdown).</string>
+    <string name="chk_markdown_strikethrough">Strikethrough (~~text~~)</string>
+    <string name="desc_markdown_strikethrough">Přeškrtnutý text pomocí ~~dvojité vlnky~~.</string>
+    <string name="chk_markdown_tasklist">Task Lists (- [x])</string>
+    <string name="desc_markdown_tasklist">GitHub-style seznam úkolů s checkboxy.</string>
+    <string name="chk_markdown_html">HTML Support</string>
+    <string name="desc_markdown_html">Základní podpora HTML tagů v markdown.</string>
+    <string name="chk_markdown_latex">LaTeX Math ($E=mc^2$)</string>
+    <string name="desc_markdown_latex">Vykreslování matematických vzorců pomocí LaTeX syntaxe.</string>
+    <string name="chk_markdown_syntax">Syntax Highlighting</string>
+    <string name="desc_markdown_syntax">Zvýrazňování syntaxe kódu pro 27+ programovacích jazyků (Prism4j).</string>
+
+    <!-- Prism Languages Category -->
+    <string name="cat_prism_languages">Podporované Jazyky</string>
+    <string name="desc_prism_languages">Vyberte jazyky pro syntax highlighting. Defaultně jsou všechny zapnuté.</string>
+
+    <!-- Agent Settings -->
+    <string name="tab_agent">Agent</string>
+    <string name="cat_agent">AI Agent &amp; Hlas</string>
+    <string name="chk_agent_enabled">Povolit Agent Mode</string>
+    <string name="desc_agent_enabled">Aktivuje služby pro ovládání telefonu.</string>
+    <string name="chk_agent_background">Běh na pozadí (Service)</string>
+    <string name="desc_agent_background">Umožní agentovi pracovat i když je aplikace zavřená.</string>
+    <string name="chk_agent_tts">Hlasová odezva (TTS)</string>
+    <string name="chk_agent_stt">Hlasové příkazy (STT)</string>
+    <string name="chk_agent_voice_feedback">Verbose Feedback</string>
+    <string name="desc_agent_voice_feedback">Říká co dělá (např. \'Klikám na.\').</string>
+    <string name="chk_wake_word">Wake Word (\'Hej Agente\')</string>
+    <string name="desc_wake_word">Aktivace hlasem. Zvyšuje spotřebu baterie.</string>
+    <string name="lbl_wake_word">Wake Word Phrase</string>
+    <string name="btn_open_accessibility">Povolit Službu Přístupnosti</string>
+    <string name="btn_test_voice">Test Hlasu</string>
+    <string name="agent_status_ready">Status: Připraven (Service běží)</string>
+    <string name="agent_status_not_enabled">Status: Služba není povolena</string>
+    <string name="agent_test_voice_message">Toto je test hlasu agenta.</string>
+    <string name="accessibility_service_label">Llama AI Agent</string>
+    <string name="accessibility_service_description">Umožňuje lokálnímu AI modelu ovládat aplikace na základě hlasových příkazů. Data neopouští zařízení.</string>
+
+    <!-- Agent Settings UI Strings -->
+    <string name="agent_service_status">Stav Služby Agenta</string>
+    <string name="agent_status_checking">Ověřování…</string>
+    <string name="agent_status_running">Běží</string>
+    <string name="agent_status_stopped">Zastaveno</string>
+    <string name="agent_enable_service">Povolit Agenta</string>
+    <string name="agent_accessibility_permission">Vyžaduje Oprávnění</string>
+    <string name="cat_permissions">Oprávnění &amp; Baterie</string>
+    <string name="btn_battery_optim">Vypnout Optimalizaci Baterie</string>
+    <string name="desc_battery_optim">Důležité pro běh na pozadí. Zabraňuje systému ukončit agenta.</string>
+    <string name="btn_setup_call_management">Nastavit Správu Hovorů</string>
+    <string name="desc_setup_call_management">Umožní agentovi zvedat a odmítat hovory (Role Dialer).</string>
+
+    <!-- Navigation Menu Strings -->
+    <string name="menu_settings">Nastavení</string>
+    <string name="agent_settings_title">Agent</string>
+    <string name="agent_enable">Povolit Agenta</string>
+    <string name="menu_other">Ostatní</string>
+    <string name="menu_export">Exportovat Chat</string>
+    <string name="menu_delete_model">Smazat Model</string>
+    <string name="agent_test_voice">Test Hlasu</string>
+    <string name="agent_voice_control">Hlasové Ovládání</string>
+    <string name="chk_agent_wake_word">Wake Word (Hej Agente)</string>
+    <string name="hint_agent_wake_word">Wake Word Phrase</string>
+
+    <!-- STT Language Strings -->
+    <string name="lbl_agent_lang_online">Online Jazyk (STT)</string>
+    <string name="lbl_agent_lang_offline">Offline Jazyk (STT)</string>
+    <string name="hint_agent_lang_select">Vyberte jazyk</string>
+    <string name="msg_agent_tts_disabled">Agent TTS je zakázán</string>
+    <string name="msg_agent_speaking">Mluvím…</string>
+    <string name="engines_default">Výchozí systémový (Default)</string>
+    <string name="msg_agent_stt_lang_loaded">🌍 Načteno %1$d STT jazyků</string>
+
+
+    <!-- AgentNotifier Strings -->
+    <string-array name="floating_notify_styles">
+        <item>Emoji + Text</item>
+        <item>Pouze Emoji</item>
+        <item>Pouze Text</item>
+    </string-array>
+
+    <string-array name="floating_notify_positions">
+        <item>Horní Střed (Výchozí)</item>
+        <item>Levý Horní Roh</item>
+        <item>Pravý Horní Roh</item>
+        <item>Levý Dolní Roh</item>
+        <item>Pravý Dolní Roh</item>
+    </string-array>
+
+    <!-- Kamera Source Strings -->
+    <string-array name="perception_camera_sources">
+        <item>Hlavní Kamera (Zadní)</item>
+        <item>Selfie Kamera (Přední)</item>
+    </string-array>
+
+    <string-array name="transcript_engine_options">
+        <item>Android (Instantní)</item>
+        <item>Whisper (Přesný)</item>
+        <item>Sherpa-ONNX (Okamžitý, Offline)</item>
+    </string-array>
+    <!-- AudioStudio UI Strings -->
+    <string name="action_summarize">Shrnutí</string>
+    <string name="action_proofread">Korektura</string>
+    <string name="action_translate">Překlad</string>
+    <string name="action_rewrite">Přepis</string>
+    <string name="action_prompt">Prompt</string>
+    <string name="action_sentiment">Sentiment</string>
+    <string name="action_save">Uložit</string>
+    <string name="action_edit">Upravit</string>
+    <string name="msg_transcript_empty">Přepis je prázdný</string>
+    <string name="msg_export_error">Chyba exportu: %1$s</string>
+    <string name="msg_copied_short">Zkopírováno</string>
+    <string name="action_share_transcript">Sdílet přepis</string>
+    <string name="action_share">Sdílet</string>
+    <string name="dialog_custom_prompt_title">Vlastní AI Prompt</string>
+    <string name="dialog_custom_prompt_hint">Např. Vytvoř osnovu pro tento text...</string>
+    <string name="action_generate">Generovat</string>
+    <string name="dialog_select_tone">Vyberte tón přepisu</string>
+</resources>
