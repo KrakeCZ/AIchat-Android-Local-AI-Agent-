@@ -1,7 +1,11 @@
-# 🦙 Android Local AI Agent 
+# 🦙 Android Local AI 
 OPEN-SOURCE/ MIT license ..
 
+examples/llama.android local AI for android here 
+https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/tree/main/examples/llama.android
+
 early-access -> really early ... 
+
 
 
 An advanced, fully on-device AI Agent for Android. This application acts as a smart accessibility layer, understanding your screen context, listening to voice commands, and executing autonomous actions—all processed locally without sending your private data to the cloud.
