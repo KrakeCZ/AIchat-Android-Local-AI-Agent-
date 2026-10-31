@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#1E1E1E">
+
+    <TextView
+        android:id="@+id/tv_editor_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="✏️ Editor dovednosti (Skill)"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:maxHeight="500dp"
+        android:layout_marginTop="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Název -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Název dovednosti:"
+                android:textColor="#CCCCCC"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/et_skill_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="např. Data Science Analyst"
+                android:textColor="@android:color/white"
+                android:textColorHint="#666666"
+                android:textSize="14sp"
+                android:inputType="textCapWords" />
+
+            <!-- Popis -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Stručný popis:"
+                android:textColor="#CCCCCC"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/et_skill_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="K čemu tato dovednost slouží..."
+                android:textColor="@android:color/white"
+                android:textColorHint="#666666"
+                android:textSize="13sp"
+                android:inputType="textMultiLine"
+                android:maxLines="2" />
+
+            <!-- Triggers -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Spouštěcí klíčová slova (oddělená čárkou):"
+                android:textColor="#CCCCCC"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/et_skill_triggers"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="např. pandas, analýza, statistika, graf"
+                android:textColor="@android:color/white"
+                android:textColorHint="#666666"
+                android:textSize="13sp"
+                android:inputType="text" />
+
+            <!-- Instrukce -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Markdown instrukce pro model:"
+                android:textColor="#CCCCCC"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/et_skill_instructions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minLines="6"
+                android:maxLines="14"
+                android:gravity="top|start"
+                android:hint="# Guidelines\n1. Vždy ověřuj vstupní data...\n2. Používej čisté vizualizace..."
+                android:textColor="@android:color/white"
+                android:textColorHint="#666666"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:background="#262626"
+                android:padding="8dp"
+                android:layout_marginTop="4dp"
+                android:inputType="textMultiLine"
+                android:scrollbars="vertical" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="12dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cancel_edit"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Zrušit"
+            android:textColor="#AAAAAA" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save_skill"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Uložit Skill" />
+    </LinearLayout>
+
+</LinearLayout>

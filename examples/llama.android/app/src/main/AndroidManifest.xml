@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <attribution android:tag="SystemAudioCapture" android:label="@string/app_name" />
+
+    <!-- Permissions for file access compatibility -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+
+    <!-- CRITICAL MISSING PERMISSION FOR STT FALLBACK -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Required for Android 13+ to show notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+    <!--
+      CRITICAL ACCESSIBILITY FEATURE:
+      This application serves as an AI Agent for visually impaired users.
+      It requires QUERY_ALL_PACKAGES to detect and utilize specialized
+      Text-to-Speech (TTS) and Speech-to-Text (STT) engines installed
+      specifically for accessibility purposes (e.g., 3rd party accessibility tools).
+      Without this, the app cannot interface with the user's preferred assistive technologies.
+    -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions" />
+
+    <!-- Mandatory for Android 11+ to interact with speech services -->
+    <queries>
+        <package android:name="com.google.android.aicore" />
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+        <intent>
+            <action android:name="android.speech.action.GET_LANGUAGE_DETAILS" />
+        </intent>
+        <!-- Explicit visibility for common Speech Services -->
+        <package android:name="com.google.android.googlequicksearchbox" />
+        <package android:name="com.google.android.tts" />
+        <package android:name="com.samsung.android.bixby.agent" />
+        <package android:name="com.samsung.android.svoice" />
+        <package android:name="com.samsung.android.asms" />
+        <!-- ADDED: Explicit visibility for Google Voice Search and GMS -->
+        <package android:name="com.google.android.voicesearch" />
+        <package android:name="com.google.android.gms" />
+        <package android:name="com.google.android.as" />
+    </queries>
+
+    <!-- ... Audio permissions ... -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <!-- FĂˇze C: NutnĂ© pro SrtTranscriptionService (batch ML processing na pozadĂ­) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- Dual-Pipeline Export Service: mediaProcessing type (Android 14 / API 34+) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+
+    <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS" />
+
+    <!-- Agent Communication & HW Toggles (Non-Root) -->
+
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- android.hardware.camera: required=false zachovava kompatibilitu se zarizeni bez fyzicke kamery -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <!--
+        NPU FEATURE DECLARATION â€” Android 17+ (API 37) povinnost.
+        Od Android 17 zavadi system NPU Manager (com.android.npumanager), ktery
+        koordinuje pristup k NPU hardwaru. Aplikace bez teto deklarace dostanou
+        EPERM pri pokusu o NnApiDelegate(), LiteRT NPU delegate nebo QNN HTP delegate.
+        required="false" = aplikace funguje na zarizenich bez NPU (CPU/GPU fallback),
+        ale na Snapdragon 8 Gen 3 (S24 Ultra) ziska plny pristup k Hexagon HTP.
+        Zdroj: Android 17 Developer Preview, Neural Networks API migration guide.
+    -->
+    <uses-feature
+        android:name="android.hardware.neural_processing_unit"
+        android:required="false" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+
+    <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+         ATTRIBUTION TAG: Android 12+ (API 31) vyĹľaduje deklaraci
+         attribution tagu pro oprĂˇvnÄ›nĂ­ pĹ™istupujĂ­cĂ­ k HW (mikrofon,
+         kamera). Eliminuje AppOps warning:
+         "attributionTag not declared in manifest"
+         DĹŻleĹľitĂ© i pro starĹˇĂ­ HW â€” redukuje AppOps logging overhead.
+         â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+    <attribution android:tag="audio_capture" android:label="@string/app_name" />
+    <attribution android:tag="camera_capture" android:label="@string/app_name" />
+
+    <application
+        android:appCategory="game"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AiChatSample"
+        android:requestLegacyExternalStorage="true"
+        android:extractNativeLibs="true"
+        android:usesCleartextTraffic="true">
+
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+             PRIVACY: KompletnĂ­ opt-out z Firebase/ML Kit telemetrie.
+             Ĺ˝ĂˇdnĂˇ data z aplikace se NEODESĂŤLAJĂŤ na Google servery.
+             ML Kit funkce (OCR, Entity Extraction, Translate, GenAI)
+             zĹŻstĂˇvajĂ­ plnÄ› funkÄŤnĂ­ â€” pouze analytika a crash reporting
+             jsou deaktivovĂˇny.
+             â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <!-- ZakĂˇĹľe Firebase Analytics sbÄ›r dat -->
+        <meta-data android:name="firebase_analytics_collection_deactivated" android:value="true" />
+        <!-- ZakĂˇĹľe Firebase Analytics automatickou inicializaci -->
+        <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
+        <!-- ZakĂˇĹľe Firebase Crashlytics automatickĂ˝ sbÄ›r -->
+        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
+        <!-- ZakĂˇĹľe Google Analytics for Firebase -->
+        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
+        <!-- ZakĂˇĹľe Firebase Cloud Messaging automatickou inicializaci -->
+        <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" />
+
+        <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+             ZĂKAZ DATATRANSPORT (ML Kit / Firebase Logging na pozadĂ­)
+             TĂ­mto se z finĂˇlnĂ­ho manifestu vymaĹľou sluĹľby odesĂ­lajĂ­cĂ­ logy.
+             â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+        <service android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery" tools:node="remove" />
+        <service android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService" tools:node="remove" />
+        <receiver android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver" tools:node="remove" />
+
+        <!-- NATIVE LIBRARIES for NPU/DSP/GPU Acceleration (Snapdragon 8 Gen 3+) -->
+        <!-- libOpenCL.so: OpenCL GPU compute pro LiteRT GPU delegate (Adreno 750) -->
+        <uses-native-library android:name="libOpenCL.so" android:required="false" />
+        <!-- libadsprpc.so: Qualcomm ADSP RPC most pro Hexagon DSP (Compute/HVX) -->
+        <uses-native-library android:name="libadsprpc.so" android:required="false" />
+        <!-- libcdsprpc.so: Qualcomm CDSP RPC most pro Hexagon HTP (QNN NPU delegate) -->
+        <uses-native-library android:name="libcdsprpc.so" android:required="false" />
+
+        <!-- Service for background LLM generation -->
+        <service android:name=".service.LlamaGenerationService" android:enabled="true" android:exported="false" android:foregroundServiceType="specialUse|microphone|mediaProjection">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="com.example.llama.service.ai_generation" />
+        </service>
+
+        <!-- AI Agent Accessibility Service -->
+        <service android:name=".agent.service.AiAgentAccessibilityService" android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" android:enabled="true" android:exported="true" android:foregroundServiceType="microphone|mediaProjection|specialUse" android:label="@string/accessibility_service_label" android:description="@string/accessibility_service_description">
+            <intent-filter android:priority="1000">
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data android:name="android.accessibilityservice" android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <!-- AI Agent VoiceInteractionService â€” ROLE_ASSISTANT registrace -->
+        <!-- UmoĹľĹuje app bĂ˝t nastavena jako "Aplikace digitĂˇlnĂ­ho asistenta" -->
+        <service android:name=".agent.service.AiAgentVoiceInteractionService" android:permission="android.permission.BIND_VOICE_INTERACTION" android:enabled="true" android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.voice.VoiceInteractionService" />
+            </intent-filter>
+            <meta-data android:name="android.voice_interaction" android:resource="@xml/interaction_service" />
+        </service>
+
+        <!-- AI Agent VoiceInteractionSessionService -->
+        <service android:name=".agent.service.AiAgentSessionService" android:permission="android.permission.BIND_VOICE_INTERACTION" android:exported="false" />
+
+        <!-- Custom IME for universal text injection (WebView, Unity, Flutter) -->
+        <service android:name=".agent.service.HyperKeyboardService" android:permission="android.permission.BIND_INPUT_METHOD" android:exported="true">
+            <meta-data android:name="android.view.im" android:resource="@xml/method" />
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+        </service>
+
+        <!-- FileProvider for Sharing Exports -->
+        <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- FIX: Added configChanges to prevent activity recreation on rotation -->
+        <activity android:name=".MainActivity" android:exported="true" android:configChanges="orientation|screenSize|screenLayout|keyboardHidden" android:windowSoftInputMode="adjustResize" android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".SettingsActivity" android:label="Settings" android:exported="true" android:parentActivityName=".MainActivity" />
+        <activity android:name=".AudioStudioActivity" android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden" android:theme="@style/Theme.AiChatSample" />
+
+        <activity android:name=".agent.irismotion.ui.RemoteProfilesActivity" android:theme="@style/Theme.AiChatSample" android:label="Remote Profiles" />
+        <activity android:name=".ui.thanks.ThanksActivity" android:theme="@style/Theme.AiChatSample" android:label="Poděkování" android:configChanges="orientation|screenSize" />
+
+        <activity android:name=".SrtEditorActivity" android:configChanges="orientation|screenSize|keyboardHidden" android:theme="@style/Theme.AiChatSample" android:windowSoftInputMode="adjustResize" android:parentActivityName=".MainActivity" />
+
+        <!-- SRT LiveEditor v2 â€” PokroÄŤilĂˇ editace titulkĹŻ s real-time nĂˇhledem -->
+        <activity android:name=".srt.ui.editor.SrtVisualEditorActivity" android:configChanges="orientation|screenSize|screenLayout|keyboardHidden" android:theme="@style/Theme.AiChatSample" android:windowSoftInputMode="adjustResize" android:parentActivityName=".AudioStudioActivity" android:label="SRT LiveEditor" />
+
+        <!-- Object Detector Studio — Vision configuration and live preview -->
+        <activity android:name=".agent.ui.studio.ObjectDetectorStudioActivity" android:configChanges="orientation|screenSize|keyboardHidden" android:theme="@style/Theme.AiChatSample" android:label="Vision Studio" />
+
+        <!-- GEN_Studio — Video & Image Generation Studio (Offline Multi-Engine DiT) -->
+        <activity android:name=".agent.ui.studio.genstudio.GenStudioActivity" android:exported="true" android:configChanges="orientation|screenSize|keyboardHidden" android:theme="@style/Theme.AiChatSample" android:label="GEN Studio" />
+
+        <activity android:name=".ui.onboarding.RestrictedSettingsGuideActivity" android:label="OmezenĂ© nastavenĂ­" android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
+
+        <!-- IrisMotion Calibration Activity â€” fullscreen, immersive (ĹľĂˇdnĂ˝ ActionBar) -->
+        <activity android:name=".agent.irismotion.CalibrationActivity" android:label="IrisMotion Kalibrace" android:exported="false" android:theme="@style/Theme.AppCompat.NoActionBar" android:screenOrientation="portrait" android:configChanges="orientation|screenSize" />
+
+        <!-- Foreground Service pro Transcript System Audio (MediaProjection host) -->
+        <service android:name=".agent.perception.TranscriptForegroundService" android:enabled="true" android:exported="false" android:foregroundServiceType="mediaProjection">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="com.example.llama.agent.transcript_system_audio" />
+        </service>
+
+        <!-- FĂˇze C: Foreground Service pro batch SRT pĹ™epis (audio/video na pozadĂ­) -->
+        <!-- foregroundServiceType=dataSync: Android 14+ â€” offline ML inference = data processing -->
+        <service android:name=".srt.SrtTranscriptionService" android:enabled="true" android:exported="false" android:foregroundServiceType="dataSync" />
+
+        <!-- Dual-Pipeline Export Service: vypalovĂˇnĂ­ titulkĹŻ (Media3 GPU + FFmpeg/libass C++) -->
+        <!-- foregroundServiceType=mediaProcessing: Android 14 (API 34+) â€” offline video processing -->
+        <service android:name=".srt.export.SubtitleExportService" android:enabled="true" android:exported="false" android:foregroundServiceType="mediaProcessing" />
+
+        <!-- GEN_Studio: Foreground Service pro bezpečné generování videa a obrazu na pozadí (DataSync + WakeLock) -->
+        <service android:name=".agent.ui.studio.genstudio.service.GenStudioForegroundService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <!-- MediaProjection Permission Activity pro zachycenĂ­ audia na pozadĂ­ -->
+        <activity android:name=".agent.perception.MediaProjectionPermissionActivity" android:theme="@android:style/Theme.Translucent.NoTitleBar" android:exported="false" android:launchMode="singleTop" />
+
+        <!-- Quick Settings Tiles pro Omni-Control -->
+        <service android:name=".agent.ui.tiles.VisionTileService" android:exported="true" android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" android:label="Vision Engine" android:icon="@drawable/ic_mic_24">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service android:name=".agent.ui.tiles.AudioTileService" android:exported="true" android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" android:label="Audio Engine" android:icon="@drawable/ic_mic_24">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service android:name=".agent.ui.tiles.OcrTileService" android:exported="true" android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" android:label="OCR" android:icon="@drawable/ic_mic_24">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service android:name=".agent.ui.tiles.SummarizationTileService" android:exported="true" android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" android:label="Summarization" android:icon="@drawable/ic_mic_24">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- Nová dlaždice pro Titulky -->
+        <service android:name=".agent.ui.TranscriptTileService" android:exported="true" android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" android:label="Titulky" android:icon="@drawable/ic_mic_24">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- Nová dlaždice pro GEN_Studio (Generování videa a obrazu) -->
+        <service android:name=".agent.ui.tiles.GenStudioTileService" android:exported="true" android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" android:label="GEN Studio" android:icon="@android:drawable/ic_menu_slideshow">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- NovĂˇ dlaĹľdice pro PC MyĹˇ (OÄŤi) - Remote Mode -->
+        <service android:name=".agent.ui.tiles.RemoteMouseTileService"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:label="PC MyĹˇ (OÄŤi)"
+            android:icon="@drawable/ic_mouse">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".agent.irismotion.bluetooth.BluetoothHidForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+
+    </application>
+
+
+</manifest>
+

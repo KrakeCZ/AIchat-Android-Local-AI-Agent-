@@ -1,0 +1,88 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"C:/SS24_V3_OK_preAgent_/examples/llama.android/lib/src/main/cpp/whisper.cpp/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 182,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 202,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 210,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"build-whisper/src/libwhisper.a"
+			],
+			"targetId" : "whisper::@bb86e6723354802c3e57",
+			"targetIndex" : 5,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "include",
+			"paths" : 
+			[
+				"C:/SS24_V3_OK_preAgent_/examples/llama.android/lib/src/main/cpp/whisper.cpp/include/whisper.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/whisper",
+			"paths" : 
+			[
+				"C:/SS24_V3_OK_preAgent_/examples/llama.android/whisper/.cxx/Release/3j46102l/x86_64/build-whisper/whisper-config.cmake",
+				"C:/SS24_V3_OK_preAgent_/examples/llama.android/whisper/.cxx/Release/3j46102l/x86_64/build-whisper/whisper-version.cmake"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "lib/pkgconfig",
+			"paths" : 
+			[
+				"C:/SS24_V3_OK_preAgent_/examples/llama.android/whisper/.cxx/Release/3j46102l/x86_64/build-whisper/whisper.pc"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "build-whisper",
+		"source" : "C:/SS24_V3_OK_preAgent_/examples/llama.android/lib/src/main/cpp/whisper.cpp"
+	}
+}

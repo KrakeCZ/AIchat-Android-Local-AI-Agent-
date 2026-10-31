@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    IME konfigurace pro HyperKeyboardService.
+    Neviditelná klávesnice pro univerzální text injection.
+    Dok. 3 kap. 4.2, Dok. 4 kap. 5.1.
+-->
+<input-method xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="com.example.llama.MainActivity"
+    android:isDefault="false">
+    <subtype
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeLocale="cs_CZ"
+        android:label="@string/app_name" />
+    <subtype
+        android:imeSubtypeMode="keyboard"
+        android:imeSubtypeLocale="en_US"
+        android:label="@string/app_name" />
+</input-method>

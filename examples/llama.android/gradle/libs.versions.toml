@@ -1,0 +1,192 @@
+[versions]
+
+# Plugins
+agp = "8.7.2"
+kotlin = "2.1.0"
+ksp = "2.1.0-1.0.29"
+
+# AndroidX
+activity = "1.9.3"
+appcompat = "1.7.0"
+core-ktx = "1.15.0"
+constraint-layout = "2.2.0"
+datastore-preferences = "1.1.1"
+lifecycle = "2.8.7"
+preference = "1.2.1"
+room = "2.6.1"
+security-crypto = "1.1.0-alpha06"
+work = "2.10.0"
+media = "1.7.0"
+media3 = "1.5.1"
+
+# Compose
+compose-bom = "2024.09.02"
+
+# Material
+material = "1.12.0"
+
+# Testing
+espresso-core = "3.6.1"
+androidx-junit = "1.2.1"
+junit = "4.13.2"
+
+# 3rd Party
+markwon = "4.6.2"
+prism4j = "2.0.0"
+
+# MediaPipe
+mediapipe = "0.10.32"
+mlkit-text-recognition = "16.0.1"
+# MediaPipe Tasks Audio (YAMNet AudioClassifier 16KB compliant)
+mediapipe-tasks-audio = "0.10.32"
+
+# LiteRT (edge)
+litert = "1.0.1"
+# Qualcomm AI Engine Direct (QNN) - NPU/Hexagon HTP delegate (Maven Central, jun 2026)
+qnn = "2.47.0"
+
+# NLP Tier 2.5 — ML Kit + MediaPipe Text
+mlkit-entity-extraction = "16.0.0-beta6"
+mlkit-language-id = "17.0.6"
+mlkit-smart-reply = "17.0.4"
+mlkit-translate = "17.0.3"
+mediapipe-tasks-text = "0.10.32"
+# NLP Tier 2.5 — GenAI (AICore / Gemini Nano) — Premium
+mlkit-genai-summarization = "1.0.0-beta1"
+mlkit-genai-proofreading = "1.0.0-beta1"
+mlkit-genai-rewriting = "1.0.0-beta1"
+mlkit-genai-prompt = "1.0.0-beta1"
+mlkit-genai-image-description = "1.0.0-beta1"
+mlkit-genai-speech-recognition = "1.0.0-alpha1"
+
+[plugins]
+android-application = { id = "com.android.application", version = "8.7.2" }
+android-library = { id = "com.android.library", version = "8.7.2" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrains-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+[libraries]
+
+# AndroidX
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraint-layout" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore-preferences" }
+
+# Compose
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+# Added Extended Icons for "ContentCopy"
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+
+# Lifecycle
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+
+# Security & Crypto
+androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "security-crypto" }
+
+# WorkManager
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work" }
+
+# Media
+androidx-media = { group = "androidx.media", name = "media", version.ref = "media" }
+
+# Media3 (ExoPlayer + Transformer + UI) — SRT LiveEditor
+androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
+androidx-media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3" }
+androidx-media3-transformer = { group = "androidx.media3", name = "media3-transformer", version.ref = "media3" }
+androidx-media3-effect = { group = "androidx.media3", name = "media3-effect", version.ref = "media3" }
+androidx-media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3" }
+
+# Room
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+
+#Material
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
+# Testing
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-junit" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+
+# Markwon (Markdown Rendering)
+markwon-core = { group = "io.noties.markwon", name = "core", version.ref = "markwon" }
+markwon-ext-tables = { group = "io.noties.markwon", name = "ext-tables", version.ref = "markwon" }
+markwon-ext-strikethrough = { group = "io.noties.markwon", name = "ext-strikethrough", version.ref = "markwon" }
+markwon-ext-tasklist = { group = "io.noties.markwon", name = "ext-tasklist", version.ref = "markwon" }
+markwon-ext-latex = { group = "io.noties.markwon", name = "ext-latex", version.ref = "markwon" } # Added LaTeX
+markwon-html = { group = "io.noties.markwon", name = "html", version.ref = "markwon" }
+markwon-syntax-highlight = { group = "io.noties.markwon", name = "syntax-highlight", version.ref = "markwon" }
+
+# Prism4j (Syntax Highlighting Engine)
+prism4j = { group = "io.noties", name = "prism4j", version.ref = "prism4j" }
+prism4j-bundler = { group = "io.noties", name = "prism4j-bundler", version.ref = "prism4j" }
+
+# MediaPipe Tasks Vision (IrisMotion — Face Landmarker)
+mediapipe-tasks-vision = { group = "com.google.mediapipe", name = "tasks-vision", version.ref = "mediapipe" }
+
+# ML Kit Text Recognition (OCR for PerceptionEngine)
+mlkit-text-recognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "mlkit-text-recognition" }
+
+# MediaPipe Tasks Audio (YAMNet AudioClassifier 16KB compliant)
+mediapipe-tasks-audio = { group = "com.google.mediapipe", name = "tasks-audio", version.ref = "mediapipe-tasks-audio" }
+
+# LiteRT API
+litert-core = { group = "com.google.ai.edge.litert", name = "litert", version.ref = "litert" }
+litert-api = { group = "com.google.ai.edge.litert", name = "litert-api", version.ref = "litert" }
+litert-gpu = { group = "com.google.ai.edge.litert", name = "litert-gpu", version.ref = "litert" }
+litert-gpu-api = { group = "com.google.ai.edge.litert", name = "litert-gpu-api", version.ref = "litert" }
+
+# Qualcomm AI Engine Direct — QNN NPU delegate (Hexagon HTP, Snapdragon 8 Gen 3+)
+# Dokumentace: ai.google.dev/edge/litert/android/qualcomm
+qnn-runtime = { group = "com.qualcomm.qti", name = "qnn-runtime", version.ref = "qnn" }
+qnn-litert-delegate = { group = "com.qualcomm.qti", name = "qnn-litert-delegate", version.ref = "qnn" }
+
+# NLP Tier 2.5 — ML Kit Core (offline, vsechna zarizeni)
+mlkit-entity-extraction = { group = "com.google.mlkit", name = "entity-extraction", version.ref = "mlkit-entity-extraction" }
+mlkit-language-id = { group = "com.google.mlkit", name = "language-id", version.ref = "mlkit-language-id" }
+mlkit-smart-reply = { group = "com.google.mlkit", name = "smart-reply", version.ref = "mlkit-smart-reply" }
+mlkit-translate = { group = "com.google.mlkit", name = "translate", version.ref = "mlkit-translate" }
+mediapipe-tasks-text = { group = "com.google.mediapipe", name = "tasks-text", version.ref = "mediapipe-tasks-text" }
+mediapipe-tasks-genai = { group = "com.google.mediapipe", name = "tasks-genai", version.ref = "mediapipe" }
+
+# NLP Tier 2.5 — GenAI Premium (AICore / Gemini Nano)
+mlkit-genai-summarization = { group = "com.google.mlkit", name = "genai-summarization", version.ref = "mlkit-genai-summarization" }
+mlkit-genai-proofreading = { group = "com.google.mlkit", name = "genai-proofreading", version.ref = "mlkit-genai-proofreading" }
+mlkit-genai-rewriting = { group = "com.google.mlkit", name = "genai-rewriting", version.ref = "mlkit-genai-rewriting" }
+mlkit-genai-prompt = { group = "com.google.mlkit", name = "genai-prompt", version.ref = "mlkit-genai-prompt" }
+mlkit-genai-image-description = { group = "com.google.mlkit", name = "genai-image-description", version.ref = "mlkit-genai-image-description" }
+mlkit-genai-speech-recognition = { group = "com.google.mlkit", name = "genai-speech-recognition", version.ref = "mlkit-genai-speech-recognition" }
+
+# AndroidX Preference
+androidx-preference = { group = "androidx.preference", name = "preference-ktx", version.ref = "preference" }
+
+[bundles]
+androidx = [
+    "androidx-activity",
+    "androidx-appcompat",
+    "androidx-constraintlayout",
+    "androidx-core-ktx",
+    "androidx-datastore-preferences",
+    "androidx-lifecycle-viewmodel-ktx",
+    "androidx-lifecycle-runtime-ktx",
+    "androidx-lifecycle-service",
+    "androidx-security-crypto",
+    "androidx-work-runtime-ktx",
+    "androidx-media",
+    "androidx-room-runtime",
+    "androidx-room-ktx",
+]
