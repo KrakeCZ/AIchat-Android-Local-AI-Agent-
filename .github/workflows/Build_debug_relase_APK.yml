@@ -59,8 +59,17 @@ jobs:
         # Nahradí Windows NDK glslc cestu systémovou linuxovou glslc binárkou
         sed -i 's|C:/Users/x/AppData/Local/Android/Sdk/ndk/29.0.13846066/shader-tools/windows-x86_64/glslc.exe|/usr/bin/glslc|g' whisper/src/main/cpp/CMakeLists.txt
 
+    - name: Prevent Out-Of-Memory by limiting Ninja jobs
+      run: |
+        # Vytvoříme wrapper pro ninja, aby vždy běžel jen se 2 vlákny (-j 2)
+        NINJA_PATH="$ANDROID_HOME/cmake/3.22.1/bin/ninja"
+        sudo mv "$NINJA_PATH" "$NINJA_PATH.real"
+        echo '#!/bin/bash' | sudo tee "$NINJA_PATH"
+        echo 'exec "'"$NINJA_PATH.real"'" -j 2 "$@"' | sudo tee -a "$NINJA_PATH"
+        sudo chmod +x "$NINJA_PATH"
+
     - name: Build with Gradle
-      run: ./gradlew assembleDebug -Porg.gradle.workers.max=2 --no-daemon
+      run: ./gradlew assembleDebug --no-parallel -Porg.gradle.workers.max=1 --no-daemon
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
