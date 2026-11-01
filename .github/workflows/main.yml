@@ -35,8 +35,18 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
+    - name: Ignore IDE specific daemon JVM settings
+      run: Remove-Item -Force -ErrorAction SilentlyContinue gradle/gradle-daemon-jvm.properties
+
+    - name: Patch gradle.properties for CI
+      run: |
+        # Nahradí tvou lokální cestu na GitHub Actions Java cestu, aby Gradle nehledal neexistující složku na CI
+        $ciJava = $env:JAVA_HOME -replace '\\', '/'
+        (Get-Content gradle.properties) -replace 'C:/Program Files/Android/Android Studio/jbr', $ciJava | Set-Content gradle.properties
+
     - name: Accept Android SDK licenses
-      run: echo y | & "$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat" --licenses
+      shell: bash
+      run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager.bat --licenses || true
 
     - name: Download required AI models
       run: .\scripts\download_models.ps1
