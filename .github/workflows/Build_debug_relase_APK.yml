@@ -30,24 +30,59 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK packages
+      - name: Install Android SDK manually
         shell: pwsh
         run: |
           $ErrorActionPreference = "Stop"
 
-          $sdkRoot = "$env:ANDROID_SDK_ROOT"
+          $sdkRoot = $env:ANDROID_SDK_ROOT
           if (-not (Test-Path $sdkRoot)) {
             New-Item -ItemType Directory -Path $sdkRoot | Out-Null
           }
 
-          $sdkManager = "$sdkRoot\cmdline-tools\latest\bin\sdkmanager.bat"
-          if (-not (Test-Path $sdkManager)) {
-            $sdkManager = "$sdkRoot\cmdline-tools\bin\sdkmanager.bat"
+          $zipUrl = "https://dl.google.com/android/repository/commandlinetools-win-11076708_latest.zip"
+          $zipPath = Join-Path $env:RUNNER_TEMP "cmdline-tools.zip"
+          $extractRoot = $env:RUNNER_TEMP
+
+          Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
+
+          if (Test-Path (Join-Path $extractRoot "cmdline-tools")) {
+            Remove-Item (Join-Path $extractRoot "cmdline-tools") -Recurse -Force
           }
 
+          if (Test-Path (Join-Path $extractRoot "cmdline-tools-win")) {
+            Remove-Item (Join-Path $extractRoot "cmdline-tools-win") -Recurse -Force
+          }
+
+          Expand-Archive -Path $zipPath -DestinationPath $extractRoot -Force
+
+          $candidate = $null
+
+          if (Test-Path (Join-Path $extractRoot "cmdline-tools")) {
+            $candidate = (Join-Path $extractRoot "cmdline-tools")
+          }
+          elseif (Test-Path (Join-Path $extractRoot "cmdline-tools-win")) {
+            $candidate = (Join-Path $extractRoot "cmdline-tools-win")
+          }
+          elseif (Test-Path (Join-Path $extractRoot "cmdline-tools-linux")) {
+            $candidate = (Join-Path $extractRoot "cmdline-tools-linux")
+          }
+
+          if (-not $candidate) {
+            Write-Error "Command line tools directory not found after extraction"
+            Get-ChildItem $extractRoot -Force | Select-Object FullName
+            exit 1
+          }
+
+          if (Test-Path (Join-Path $sdkRoot "cmdline-tools")) {
+            Remove-Item (Join-Path $sdkRoot "cmdline-tools") -Recurse -Force
+          }
+
+          New-Item -ItemType Directory -Path (Join-Path $sdkRoot "cmdline-tools") -Force | Out-Null
+
+          Move-Item $candidate (Join-Path $sdkRoot "cmdline-tools\latest")
+
+          $sdkManager = Join-Path $sdkRoot "cmdline-tools\latest\bin\sdkmanager.bat"
           if (-not (Test-Path $sdkManager)) {
             Write-Error "sdkmanager not found at $sdkManager"
             exit 1
