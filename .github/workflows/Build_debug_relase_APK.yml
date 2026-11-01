@@ -30,19 +30,6 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Override Gradle Java discovery for CI only
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-
-          $env:ORG_GRADLE_PROJECT_org.gradle.java.installations.fromEnv = "JAVA_HOME"
-          $env:ORG_GRADLE_PROJECT_org.gradle.java.installations.auto-detect = "true"
-          $env:ORG_GRADLE_PROJECT_org.gradle.java.installations.auto-download = "true"
-          $env:ORG_GRADLE_PROJECT_org.gradle.java.installations.paths = $env:JAVA_HOME
-
-          Write-Host "JAVA_HOME=$env:JAVA_HOME"
-          Write-Host "ORG_GRADLE_PROJECT_org.gradle.java.installations.paths=$env:ORG_GRADLE_PROJECT_org.gradle.java.installations.paths"
-
       - name: Install Android SDK manually
         shell: pwsh
         run: |
@@ -62,11 +49,9 @@ jobs:
           $candidate = $null
           if (Test-Path (Join-Path $env:RUNNER_TEMP "cmdline-tools")) {
             $candidate = (Join-Path $env:RUNNER_TEMP "cmdline-tools")
-          }
-          elseif (Test-Path (Join-Path $env:RUNNER_TEMP "cmdline-tools-win")) {
+          } elseif (Test-Path (Join-Path $env:RUNNER_TEMP "cmdline-tools-win")) {
             $candidate = (Join-Path $env:RUNNER_TEMP "cmdline-tools-win")
-          }
-          elseif (Test-Path (Join-Path $env:RUNNER_TEMP "cmdline-tools-linux")) {
+          } elseif (Test-Path (Join-Path $env:RUNNER_TEMP "cmdline-tools-linux")) {
             $candidate = (Join-Path $env:RUNNER_TEMP "cmdline-tools-linux")
           }
 
