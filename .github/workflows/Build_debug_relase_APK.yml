@@ -1,57 +1,84 @@
-name: Build Llama Android APK
+name: Build Llama Android APK (Windows + Linux)
 
 on:
   workflow_dispatch:
   push:
     paths:
       - "examples/llama.android/**"
-      - ".github/workflows/Build_debug_relase_APK.yml"
+      - ".github/workflows/*.yml"
 
 jobs:
   build-apk:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 90
 
     env:
-      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-      ANDROID_HOME: /usr/local/lib/android/sdk
+      JAVA_VERSION: "17"
 
     defaults:
       run:
         working-directory: examples/llama.android
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: ${{ env.JAVA_VERSION }}
 
-      - name: Install Android SDK commandline tools
+      - name: Setup Android SDK (OS-aware)
         shell: bash
         run: |
+          if [ "${RUNNER_OS}" = "Windows" ]; then
+            export ANDROID_SDK_ROOT="${LOCALAPPDATA}/Android/Sdk"
+            export ANDROID_HOME="${LOCALAPPDATA}/Android/Sdk"
+            export CLT_URL="https://dl.google.com/android/repository/commandlinetools-win-11076708_latest.zip"
+          else
+            export ANDROID_SDK_ROOT="${HOME}/Android/Sdk"
+            export ANDROID_HOME="${HOME}/Android/Sdk"
+            export CLT_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
+          fi
+
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          echo "ANDROID_HOME=$ANDROID_HOME"
+
+          mkdir -p "$ANDROID_SDK_ROOT"
+          cd /tmp
+          curl -L -o cmdline-tools.zip "$CLT_URL"
+          unzip -q -o cmdline-tools.zip
+
           mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
-          cd "$ANDROID_SDK_ROOT/cmdline-tools"
-          curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o cmdline-tools.zip
-          unzip -o -q cmdline-tools.zip
-          rm -rf latest
-          mv cmdline-tools latest
+          if [ -d "/tmp/cmdline-tools" ]; then
+            rm -rf "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+            mv /tmp/cmdline-tools "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+          fi
 
-      - name: Install Android SDK packages
-        shell: bash
-        run: |
-          yes | "$ANDROID_SDK_ROOT"/cmdline-tools/latest/bin/sdkmanager --licenses
-          "$ANDROID_SDK_ROOT"/cmdline-tools/latest/bin/sdkmanager \
+          if [ ! -x "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
+            echo "sdkmanager not found at $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+            ls -R "$ANDROID_SDK_ROOT"
+            exit 1
+          fi
+
+          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_SDK_ROOT" --licenses
+          "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_SDK_ROOT" \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;36.1.0" \
             "cmake;3.22.1" \
             "ndk;29.0.13846066"
 
-      - name: Download required AI model files
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          echo "Generated local.properties for ${RUNNER_OS}"
+
+      - name: Download AI model assets
         shell: bash
         run: |
           chmod +x ./scripts/download_models.sh
@@ -65,5 +92,7 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: llama-android-debug-apk
-          path: examples/llama.android/app/build/outputs/apk/debug/app-debug.apk
+          name: llama-android-debug-apk-${{ matrix.os }}
+          path: |
+            examples/llama.android/app/build/outputs/apk/debug/app-debug.apk
+            examples/llama.android/app/build/outputs/apk/debug/*.apk
