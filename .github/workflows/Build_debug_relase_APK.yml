@@ -2,71 +2,113 @@ name: Build Android Debug APK
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
     paths:
-      - 'examples/llama.android/**'
-      - '.github/workflows/build-android-apk.yml'
+      - "examples/llama.android/**"
+      - ".github/workflows/Build_debug_relase_APK.yml"
   pull_request:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
     paths:
-      - 'examples/llama.android/**'
-      - '.github/workflows/build-android-apk.yml'
-  workflow_dispatch: # Umožní ruční spuštění přes GitHub UI
+      - "examples/llama.android/**"
+      - ".github/workflows/Build_debug_relase_APK.yml"
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
 
-    # Výchozí složka pro všechny run příkazy
     defaults:
       run:
+        shell: pwsh
         working-directory: examples/llama.android
 
+    env:
+      ANDROID_HOME: C:\Android\android-sdk
+      ANDROID_SDK_ROOT: C:\Android\android-sdk
+      GRADLE_OPTS: >-
+        -Dorg.gradle.daemon=false
+        -Dorg.gradle.parallel=false
+        -Dorg.gradle.workers.max=2
+        -Dkotlin.compiler.execution.strategy=in-process
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive # VELMI DŮLEŽITÉ pro stažení Vulkan-Headers a llama.cpp/whisper.cpp
-        lfs: true # NEZBYTNÉ pro stažení reálných souborů jako sherpa-onnx-1.12.34.aar
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          lfs: true
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: gradle
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: gradle
 
-    - name: Ignore IDE specific daemon JVM settings
-      run: rm -f gradle/gradle-daemon-jvm.properties
+      - name: Install Android commandline tools manually
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
 
-    - name: Grant execute permissions for scripts
-      run: |
-        chmod +x gradlew
-        chmod +x scripts/download_models.sh
+          New-Item -ItemType Directory -Force -Path "$env:ANDROID_HOME" | Out-Null
+          New-Item -ItemType Directory -Force -Path "$env:ANDROID_HOME\cmdline-tools" | Out-Null
 
-    - name: Download required AI models
-      run: ./scripts/download_models.sh
+          if (-not (Test-Path "$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat")) {
+            $zip = "$env:RUNNER_TEMP\cmdline-tools.zip"
+            Invoke-WebRequest `
+              -Uri "https://dl.google.com/android/repository/commandlinetools-win-11076708_latest.zip" `
+              -OutFile $zip
 
-    - name: Accept Android SDK licenses
-      run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+            Expand-Archive -Path $zip -DestinationPath "$env:ANDROID_HOME\cmdline-tools" -Force
 
-    - name: Install Vulkan shader compiler (glslc)
-      run: sudo apt-get update && sudo apt-get install -y glslc
+            if (Test-Path "$env:ANDROID_HOME\cmdline-tools\cmdline-tools") {
+              Move-Item "$env:ANDROID_HOME\cmdline-tools\cmdline-tools" "$env:ANDROID_HOME\cmdline-tools\latest" -Force
+            }
+          }
 
-    - name: Patch local Windows paths for CI Linux environment
-      run: |
-        # Opraví hardcodovanou Java cestu v gradle.properties na CI $JAVA_HOME
-        sed -i 's|C:/Program Files/Android/Android Studio/jbr|'"$JAVA_HOME"'|g' gradle.properties
-        # Nahradí Windows NDK glslc cestu systémovou linuxovou glslc binárkou
-        sed -i 's|C:/Users/x/AppData/Local/Android/Sdk/ndk/29.0.13846066/shader-tools/windows-x86_64/glslc.exe|/usr/bin/glslc|g' whisper/src/main/cpp/CMakeLists.txt
-        # ÚPLNĚ SMAŽE CLEAN ROOM WORKAROUND na Linuxu (protože v něm zůstalo include(ExternalProject), které narušovalo generátor)
-        sed -i '/# --- CLEAN ROOM WORKAROUND FOR GGML-VULKAN ON WINDOWS ---/,/# --------------------------------------------------------/d' whisper/src/main/cpp/CMakeLists.txt
+      - name: Accept licenses and install SDK packages
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
 
-    - name: Build with Gradle
-      run: ./gradlew assembleDebug
+          cmd /c "echo y | ""$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat"" --licenses"
+          cmd /c "echo y | ""$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat"" --sdk_root=""$env:ANDROID_HOME"" platform-tools platforms;android-35 build-tools;35.0.0 cmake;3.22.1 ndk;29.0.13846066"
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-debug
-        path: examples/llama.android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Prepare repo for CI
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          Remove-Item -Force gradle/gradle-daemon-jvm.properties -ErrorAction SilentlyContinue
+
+          $ndkRoot = Join-Path $env:ANDROID_HOME "ndk\29.0.13846066"
+          $glslcPath = Join-Path $ndkRoot "shader-tools\windows-x86_64\glslc.exe"
+
+          if (Test-Path "gradle.properties") {
+            (Get-Content gradle.properties) `
+              -replace 'C:/Program Files/Android/Android Studio/jbr', $env:JAVA_HOME `
+              | Set-Content gradle.properties
+          }
+
+          if (Test-Path "whisper/src/main/cpp/CMakeLists.txt") {
+            $content = Get-Content "whisper/src/main/cpp/CMakeLists.txt" -Raw
+            $content = $content -replace 'C:/Users/x/AppData/Local/Android/Sdk/ndk/29.0.13846066/shader-tools/windows-x86_64/glslc.exe', $glslcPath
+            $content = $content -replace '(?s)# --- CLEAN ROOM WORKAROUND FOR GGML-VULKAN ON WINDOWS ---.*?# --------------------------------------------------------', ''
+            Set-Content "whisper/src/main/cpp/CMakeLists.txt" $content
+          }
+
+      - name: Download AI models
+        shell: pwsh
+        run: |
+          bash ./scripts/download_models.sh
+
+      - name: Build with Gradle
+        shell: pwsh
+        run: |
+          .\gradlew.bat assembleDebug --no-daemon --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: examples/llama.android/app/build/outputs/apk/debug/app-debug.apk
