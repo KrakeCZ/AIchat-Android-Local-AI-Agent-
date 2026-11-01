@@ -6,6 +6,8 @@ on:
     paths:
       - 'examples/llama.android/**'
       - '.github/workflows/build-android-apk.yml'
+    tags:
+      - 'v*'
   pull_request:
     branches: [ "main", "master" ]
     paths:
@@ -28,9 +30,11 @@ concurrency:
 
 jobs:
   build:
-    name: Build APK (${{ github.event.inputs.build_type || 'debug' }})
+    name: Build APK (${{ github.event.inputs.build_type || (startsWith(github.ref, 'refs/tags/') && 'release') || 'debug' }})
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: write
 
     defaults:
       run:
@@ -118,14 +122,16 @@ jobs:
 
       - name: Build APK with Gradle
         env:
-          BUILD_TYPE: ${{ github.event.inputs.build_type || 'debug' }}
+          BUILD_TYPE: ${{ github.event.inputs.build_type || '' }}
         run: |
-          echo "Spouštím kompilaci: $BUILD_TYPE"
           if [ "$BUILD_TYPE" = "release" ]; then
+            echo "Spouštím kompilaci: RELEASE"
             ./gradlew assembleRelease --stacktrace
-          elif [ "$BUILD_TYPE" = "both" ]; then
+          elif [ "$BUILD_TYPE" = "both" ] || [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            echo "Spouštím kompilaci: DEBUG + RELEASE"
             ./gradlew assembleDebug assembleRelease --stacktrace
           else
+            echo "Spouštím kompilaci: DEBUG"
             ./gradlew assembleDebug --stacktrace
           fi
 
@@ -136,3 +142,11 @@ jobs:
           path: examples/llama.android/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Upload APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            examples/llama.android/app/build/outputs/apk/**/*.apk
+          generate_release_notes: true
