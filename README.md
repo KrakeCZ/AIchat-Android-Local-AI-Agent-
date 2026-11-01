@@ -37,6 +37,10 @@ The project is designed as an "Assistive Technology" and places absolute emphasi
  * **Cascading Fallback:** Support for MediaPipe LLM (LiteRT bundle) and Google AICore (Gemini Nano) models as fallbacks for devices with varying hardware capabilities [7, 8].
  * **Multimodality:** The agent can process visual inputs (screen captures or live camera feed) using visual models [5, 9].
 ### 👁️ IrisMotion (Hands-Free Eye Control)
+
+ * **„No expensive eye tracker. Just an Android phone and its selfie camera.“ **
+ * ** I started IrisMotion because I believe nobody should need an expensive device just to try controlling a screen with their eyes. It's free, open-source, and designed to work with ordinary Android phones. I'm looking for developers and accessibility testers to help make it better!**
+ * 
  * **Precise Gaze Tracking:** Utilizes MediaPipe Face Mesh to calculate an accurate gaze vector using 3D inverse kinematics and neural Blendshapes [10, 11].
  * **6DoF Support:** Supports cursor movement not only through rotation but also head translation (Yaw, Pitch, Roll, X, Y, Z translation) [12].
  * **Dwell & Blink Clicking:** Autonomous clicking via stabilized staring (Dwell) or intentional blink detection (Blink Phase Detector) [13, 14].
