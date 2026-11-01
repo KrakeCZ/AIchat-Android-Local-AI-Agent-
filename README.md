@@ -15,7 +15,7 @@ An advanced, fully on-device AI Agent for Android. This application acts as a sm
 
 [![Platform: Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://android.com)
 [![Offline First](https://img.shields.io/badge/Offline-100%25-blue.svg)](#privacy)
-[![F-Droid Compatible](https://img.shields.io/badge/F--Droid-Ready-blue.svg)](https://f-droid.org)
+[![Build Android APK](https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/actions/workflows/Build_debug_relase_APK.yml/badge.svg)](https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/actions/workflows/Build_debug_relase_APK.yml)
 
 Android local AI Agent is a comprehensive, open-source assistive platform for Android that runs entirely locally without the need for cloud connectivity [1]. The application combines the power of local LLMs (Large Language Models), Computer Vision, audio processing, and advanced eye tracking (IrisMotion) to enable fully autonomous and hands-free device control [2, 3].
 ​The project is designed as an "Assistive Technology" and places absolute emphasis on user data security. It contains no trackers and is an ideal candidate for distribution via F-Droid [1, 4].
@@ -98,14 +98,11 @@ This agent operates primarily offline.
 2. Download the latest `app-release.apk`.
 3. Install the APK on your Android device (Android 13+ recommended).
 
-### Option 2: Custom F-Droid Repository
-*(Add your F-Droid repo link here if you create one)*
-Add this repository to your F-Droid client:
-`https://github.com/YOUR_NAME/YOUR_REPO/releases/download/fdroid/repo`
 
 ## ⚙️ Setup & Permissions
 
 To function correctly, the AI Agent requires the following permissions:
+0. for install om Android 17 ui9 must turn play protect (after instal turn on) 
 1. **Accessibility Service**: Go to `Settings -> Accessibility -> AI Agent` and enable it. This is required to read screen context and perform clicks.
 2. **Display Over Other Apps**: Required for the floating Agent button and visual bounding-box overlays.
 3. **Microphone**: For voice commands and dictation features.
@@ -115,5 +112,5 @@ To function correctly, the AI Agent requires the following permissions:
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/YOUR_NAME/YOUR_REPO.git](https://github.com/YOUR_NAME/YOUR_REPO.git)
+   git clone [https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-.git](https:/github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-.git)
 
