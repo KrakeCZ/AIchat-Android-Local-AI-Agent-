@@ -1,0 +1,61 @@
+name: Build Llama Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "examples/llama.android/**"
+      - ".github/workflows/build-llama.yml"
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    defaults:
+      run:
+        working-directory: examples/llama.android
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        shell: bash
+        run: |
+          yes | "$ANDROID_HOME"/cmdline-tools/latest/bin/sdkmanager --licenses
+          "$ANDROID_HOME"/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;36.1.0" \
+            "cmake;3.22.1" \
+            "ndk;29.0.13846066"
+
+      - name: Make download script executable
+        shell: bash
+        run: chmod +x ./scripts/download_models.sh
+
+      - name: Download required AI model assets
+        shell: bash
+        run: |
+          ./scripts/download_models.sh
+
+      - name: Build debug APK
+        shell: bash
+        run: |
+          ./gradlew --no-daemon :app:assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: llama-android-debug-apk
+          path: examples/llama.android/app/build/outputs/apk/debug/app-debug.apk
