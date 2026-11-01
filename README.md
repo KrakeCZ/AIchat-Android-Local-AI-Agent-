@@ -6,7 +6,8 @@ examples/llama.android local AI for android here 👇
 https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/tree/main/examples/llama.android
 
 early-access -> really early ... 
-
+kotlin layer👇
+https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/tree/main/examples/llama.android/app/src/main/java/com/example/llama
 
 
 An advanced, fully on-device AI Agent for Android. This application acts as a smart accessibility layer, understanding your screen context, listening to voice commands, and executing autonomous actions—all processed locally without sending your private data to the cloud.
@@ -36,7 +37,8 @@ The project is designed as an "Assistive Technology" and places absolute emphasi
  * **Llama.cpp Integration:** Support for GGUF models running locally using the llama.cpp JNI layer [5]. Models run in isolated processes with hardware acceleration support and multi-thread optimization [6].
  * **Cascading Fallback:** Support for MediaPipe LLM (LiteRT bundle) and Google AICore (Gemini Nano) models as fallbacks for devices with varying hardware capabilities [7, 8].
  * **Multimodality:** The agent can process visual inputs (screen captures or live camera feed) using visual models [5, 9].
-### 👁️ IrisMotion (Hands-Free Eye Control)
+### 👁️ IrisMotion (Hands-Free Eye Control)👇
+https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/tree/main/examples/llama.android/app/src/main/java/com/example/llama/agent/irismotion
 
  * **„No expensive eye tracker. Just an Android phone and its selfie camera.“ **
  * ** I started IrisMotion because I believe nobody should need an expensive device just to try controlling a screen with their eyes. It's free, open-source, and designed to work with ordinary Android phones. I'm looking for developers and accessibility testers to help make it better!**
