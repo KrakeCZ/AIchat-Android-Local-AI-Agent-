@@ -1,114 +1,119 @@
-name: Build Android Debug APK
+name: Build Android APK
 
 on:
   push:
-    branches: ["main", "master"]
+    branches: [ "main", "master" ]
     paths:
-      - "examples/llama.android/**"
-      - ".github/workflows/Build_debug_relase_APK.yml"
+      - 'examples/llama.android/**'
+      - '.github/workflows/build-android-apk.yml'
   pull_request:
-    branches: ["main", "master"]
+    branches: [ "main", "master" ]
     paths:
-      - "examples/llama.android/**"
-      - ".github/workflows/Build_debug_relase_APK.yml"
+      - 'examples/llama.android/**'
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Typ sestavení (debug / release / both)'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
+          - both
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    runs-on: windows-latest
+    name: Build APK (${{ github.event.inputs.build_type || 'debug' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     defaults:
       run:
-        shell: pwsh
         working-directory: examples/llama.android
-
-    env:
-      ANDROID_HOME: C:\Android\android-sdk
-      ANDROID_SDK_ROOT: C:\Android\android-sdk
-      GRADLE_OPTS: >-
-        -Dorg.gradle.daemon=false
-        -Dorg.gradle.parallel=false
-        -Dorg.gradle.workers.max=2
-        -Dkotlin.compiler.execution.strategy=in-process
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          fetch-depth: 1
           submodules: recursive
           lfs: true
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "21"
-          cache: gradle
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
 
-      - name: Install Android commandline tools manually
-        shell: pwsh
+      - name: Set up Android NDK r29
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r29
+          add-to-path: true
+          link-to-sdk: true
+
+      - name: Configure Android SDK & NDK Links
         run: |
-          $ErrorActionPreference = "Stop"
+          echo "Konfigurace NDK pro Android Gradle Plugin..."
+          mkdir -p "$ANDROID_HOME/ndk"
+          # Vytvoření symlinků pro přesnou shodu s ndkVersion deklarovanou v Gradle skriptech
+          ln -sfn "$ANDROID_NDK_HOME" "$ANDROID_HOME/ndk/29.0.13846066 rc3"
+          ln -sfn "$ANDROID_NDK_HOME" "$ANDROID_HOME/ndk/29.0.13846066"
+          ln -sfn "$ANDROID_NDK_HOME" "$ANDROID_HOME/ndk/29.0.13846066-beta3"
+          echo "ndk.dir=$ANDROID_NDK_HOME" >> local.properties
+          echo "sdk.dir=$ANDROID_HOME" >> local.properties
 
-          New-Item -ItemType Directory -Force -Path "$env:ANDROID_HOME" | Out-Null
-          New-Item -ItemType Directory -Force -Path "$env:ANDROID_HOME\cmdline-tools" | Out-Null
-
-          if (-not (Test-Path "$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat")) {
-            $zip = "$env:RUNNER_TEMP\cmdline-tools.zip"
-            Invoke-WebRequest `
-              -Uri "https://dl.google.com/android/repository/commandlinetools-win-11076708_latest.zip" `
-              -OutFile $zip
-
-            Expand-Archive -Path $zip -DestinationPath "$env:ANDROID_HOME\cmdline-tools" -Force
-
-            if (Test-Path "$env:ANDROID_HOME\cmdline-tools\cmdline-tools") {
-              Move-Item "$env:ANDROID_HOME\cmdline-tools\cmdline-tools" "$env:ANDROID_HOME\cmdline-tools\latest" -Force
-            }
-          }
-
-      - name: Accept licenses and install SDK packages
-        shell: pwsh
+      - name: Patch CI Configuration & Memory Limits
         run: |
-          $ErrorActionPreference = "Stop"
+          echo "Optimalizace gradle.properties a CMake pro CI runner (7GB RAM)..."
+          # 1. Odstranit lokální Windows cesty na Android Studio JBR
+          sed -i '/org.gradle.java.installations.paths/d' gradle.properties
 
-          cmd /c "echo y | ""$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat"" --licenses"
-          cmd /c "echo y | ""$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat"" --sdk_root=""$env:ANDROID_HOME"" platform-tools platforms;android-35 build-tools;35.0.0 cmake;3.22.1 ndk;29.0.13846066"
+          # 2. Upravit limity RAM pro GitHub Actions runner (prevence OOM killeru)
+          sed -i 's/-Xmx10g/-Xmx4096m/g' gradle.properties
+          sed -i 's/-Xmx6g/-Xmx2048m/g' gradle.properties
+          sed -i 's/org.gradle.workers.max=4/org.gradle.workers.max=2/g' gradle.properties
 
-      - name: Prepare repo for CI
-        shell: pwsh
+          # 3. Odstranit IDE specifický daemon JVM soubor, aby Gradle použil nainstalovaný JDK 21
+          rm -f gradle/gradle-daemon-jvm.properties
+
+          # 4. Nahradit Windows cestu k shader kompilátoru glslc v whisper CMakeLists na systémový NDK glslc
+          if [ -f "whisper/src/main/cpp/CMakeLists.txt" ]; then
+            sed -i 's|set(Vulkan_GLSLC_EXECUTABLE "C:/.*glslc\.exe".*)|set(Vulkan_GLSLC_EXECUTABLE "$ENV{ANDROID_NDK_HOME}/shader-tools/linux-x86_64/glslc" CACHE FILEPATH "Path to glslc")|g' whisper/src/main/cpp/CMakeLists.txt
+          fi
+
+      - name: Download AI Models for Assets Check
         run: |
-          $ErrorActionPreference = "Stop"
+          chmod +x scripts/download_models.sh
+          ./scripts/download_models.sh
 
-          Remove-Item -Force gradle/gradle-daemon-jvm.properties -ErrorAction SilentlyContinue
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x gradlew
 
-          $ndkRoot = Join-Path $env:ANDROID_HOME "ndk\29.0.13846066"
-          $glslcPath = Join-Path $ndkRoot "shader-tools\windows-x86_64\glslc.exe"
-
-          if (Test-Path "gradle.properties") {
-            (Get-Content gradle.properties) `
-              -replace 'C:/Program Files/Android/Android Studio/jbr', $env:JAVA_HOME `
-              | Set-Content gradle.properties
-          }
-
-          if (Test-Path "whisper/src/main/cpp/CMakeLists.txt") {
-            $content = Get-Content "whisper/src/main/cpp/CMakeLists.txt" -Raw
-            $content = $content -replace 'C:/Users/x/AppData/Local/Android/Sdk/ndk/29.0.13846066/shader-tools/windows-x86_64/glslc.exe', $glslcPath
-            $content = $content -replace '(?s)# --- CLEAN ROOM WORKAROUND FOR GGML-VULKAN ON WINDOWS ---.*?# --------------------------------------------------------', ''
-            Set-Content "whisper/src/main/cpp/CMakeLists.txt" $content
-          }
-
-      - name: Download AI models
-        shell: pwsh
+      - name: Build APK with Gradle
+        env:
+          BUILD_TYPE: ${{ github.event.inputs.build_type || 'debug' }}
         run: |
-          bash ./scripts/download_models.sh
+          echo "Spouštím kompilaci: $BUILD_TYPE"
+          if [ "$BUILD_TYPE" = "release" ]; then
+            ./gradlew assembleRelease --stacktrace
+          elif [ "$BUILD_TYPE" = "both" ]; then
+            ./gradlew assembleDebug assembleRelease --stacktrace
+          else
+            ./gradlew assembleDebug --stacktrace
+          fi
 
-      - name: Build with Gradle
-        shell: pwsh
-        run: |
-          .\gradlew.bat assembleDebug --no-daemon --stacktrace
-
-      - name: Upload APK
+      - name: Upload APK Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug
-          path: examples/llama.android/app/build/outputs/apk/debug/app-debug.apk
+          name: AI-Chat-Android-APKs
+          path: examples/llama.android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
+          retention-days: 14
