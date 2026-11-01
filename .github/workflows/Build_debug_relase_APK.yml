@@ -5,7 +5,7 @@ on:
     branches: [ "main", "master" ]
     paths:
       - 'examples/llama.android/**'
-      - '.github/workflows/build-android-apk.yml'
+      - '.github/workflows/**'
     tags:
       - 'v*'
   pull_request:
@@ -17,7 +17,7 @@ on:
       build_type:
         description: 'Typ sestavení (debug / release / both)'
         required: true
-        default: 'debug'
+        default: 'both'
         type: choice
         options:
           - debug
@@ -30,7 +30,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build APK (${{ github.event.inputs.build_type || (startsWith(github.ref, 'refs/tags/') && 'release') || 'debug' }})
+    name: Build APK (${{ github.event.inputs.build_type || 'both' }})
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -122,17 +122,16 @@ jobs:
 
       - name: Build APK with Gradle
         env:
-          BUILD_TYPE: ${{ github.event.inputs.build_type || '' }}
+          BUILD_TYPE: ${{ github.event.inputs.build_type || 'both' }}
         run: |
+          echo "Spouštím kompilaci APK ($BUILD_TYPE)..."
           if [ "$BUILD_TYPE" = "release" ]; then
-            echo "Spouštím kompilaci: RELEASE"
             ./gradlew assembleRelease --stacktrace
-          elif [ "$BUILD_TYPE" = "both" ] || [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            echo "Spouštím kompilaci: DEBUG + RELEASE"
-            ./gradlew assembleDebug assembleRelease --stacktrace
-          else
-            echo "Spouštím kompilaci: DEBUG"
+          elif [ "$BUILD_TYPE" = "debug" ]; then
             ./gradlew assembleDebug --stacktrace
+          else
+            # Sestavit Debug i Release (pokud release nemá podpis, fallback na debug)
+            ./gradlew assembleDebug assembleRelease --stacktrace || ./gradlew assembleDebug --stacktrace
           fi
 
       - name: Upload APK Artifacts
@@ -145,8 +144,10 @@ jobs:
 
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.0.01' }}
+          name: "AI Chat Android Release ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.0.01' }}"
           files: |
             examples/llama.android/app/build/outputs/apk/**/*.apk
           generate_release_notes: true
+          make_latest: true
