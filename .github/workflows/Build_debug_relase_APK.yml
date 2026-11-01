@@ -44,6 +44,9 @@ jobs:
     - name: Download required AI models
       run: ./scripts/download_models.sh
 
+    - name: Accept Android SDK licenses
+      run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
     - name: Build with Gradle
       run: ./gradlew assembleDebug
 
