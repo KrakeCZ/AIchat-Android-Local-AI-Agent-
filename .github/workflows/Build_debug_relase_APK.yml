@@ -62,19 +62,29 @@ jobs:
       - name: Configure Android SDK & NDK Links
         run: |
           NDK_PATH="${{ steps.setup-ndk.outputs.ndk-path }}"
-          echo "Používám NDK r29 z: $NDK_PATH"
-          mkdir -p "$ANDROID_HOME/ndk"
-          # Vytvoření symlinků pro přesnou shodu s ndkVersion deklarovanou v Gradle skriptech
-          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/29.0.13846066 rc3"
-          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/29.0.13846066"
-          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/29.0.13846066-beta3"
+          echo "Používám NDK z: $NDK_PATH"
 
-          # Vyčistit a správně nastavit local.properties s novým NDK r29
+          # 1. Detekce přesné verze staženého NDK na CI runneru (např. 29.0.14206865)
+          NDK_VER=$(grep -i '^Pkg.Revision' "$NDK_PATH/source.properties" | cut -d'=' -f2 | tr -d ' ' | cut -d'-' -f1)
+          echo "Detekovaná verze NDK na CI: $NDK_VER"
+
+          # 2. Vytvoření symlinků v SDK pro obě verze
+          mkdir -p "$ANDROID_HOME/ndk"
+          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/$NDK_VER"
+          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/29.0.13846066"
+          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/29.0.13846066 rc3"
+
+          # 3. Dynamické sjednocení ndkVersion v Gradle modulech s verzí na CI runneru
+          sed -i "s/ndkVersion = .*/ndkVersion = \"$NDK_VER\"/g" app/build.gradle.kts
+          sed -i "s/ndkVersion = .*/ndkVersion = \"$NDK_VER\"/g" lib/build.gradle.kts
+          sed -i "s/ndkVersion = .*/ndkVersion = \"$NDK_VER\"/g" whisper/build.gradle.kts
+
+          # 4. Vyčistit a správně nastavit local.properties
           rm -f local.properties lib/local.properties whisper/local.properties app/local.properties
           echo "sdk.dir=$ANDROID_HOME" > local.properties
           echo "ndk.dir=$NDK_PATH" >> local.properties
 
-          # Přepsat výchozí proměnné prostředí runneru (které ukazovaly na staré NDK 27)
+          # 5. Export proměnných pro následující kroky a CMake
           echo "ANDROID_NDK_HOME=$NDK_PATH" >> $GITHUB_ENV
           echo "ANDROID_NDK_ROOT=$NDK_PATH" >> $GITHUB_ENV
           echo "ANDROID_NDK=$NDK_PATH" >> $GITHUB_ENV
