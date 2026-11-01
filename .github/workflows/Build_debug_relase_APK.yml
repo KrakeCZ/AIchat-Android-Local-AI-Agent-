@@ -61,7 +61,11 @@ jobs:
 
     - name: Prevent Out-Of-Memory by limiting Ninja jobs
       run: |
-        # Vytvoříme wrapper pro ninja, aby vždy běžel jen se 2 vlákny (-j 2)
+        # Gradle běžně stahuje CMake 3.22.1 až uvnitř buildu. Abychom mohli Ninja upravit předem,
+        # musíme si CMake vyžádat ze SDK manageru rovnou tady:
+        $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "cmake;3.22.1"
+
+        # Nyní už soubor existuje a vytvoříme wrapper pro ninja, aby vždy běžel jen se 2 vlákny (-j 2)
         NINJA_PATH="$ANDROID_HOME/cmake/3.22.1/bin/ninja"
         sudo mv "$NINJA_PATH" "$NINJA_PATH.real"
         echo '#!/bin/bash' | sudo tee "$NINJA_PATH"
