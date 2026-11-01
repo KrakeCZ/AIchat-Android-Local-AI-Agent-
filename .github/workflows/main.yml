@@ -23,6 +23,8 @@ jobs:
         working-directory: examples/llama.android
 
     env:
+      ANDROID_HOME: C:\Android\android-sdk
+      ANDROID_SDK_ROOT: C:\Android\android-sdk
       GRADLE_OPTS: >-
         -Dorg.gradle.daemon=false
         -Dorg.gradle.parallel=false
@@ -43,14 +45,37 @@ jobs:
           java-version: "21"
           cache: gradle
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK components
+      - name: Install Android commandline tools manually
         shell: pwsh
         run: |
-          & "$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat" --licenses
+          $ErrorActionPreference = "Stop"
+
+          New-Item -ItemType Directory -Force -Path "$env:ANDROID_HOME" | Out-Null
+          New-Item -ItemType Directory -Force -Path "$env:ANDROID_HOME\cmdline-tools" | Out-Null
+
+          if (-not (Test-Path "$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat")) {
+            $zip = "$env:RUNNER_TEMP\cmdline-tools.zip"
+            Invoke-WebRequest `
+              -Uri "https://dl.google.com/android/repository/commandlinetools-win-11076708_latest.zip" `
+              -OutFile $zip
+
+            Expand-Archive -Path $zip -DestinationPath "$env:ANDROID_HOME\cmdline-tools" -Force
+
+            if (Test-Path "$env:ANDROID_HOME\cmdline-tools\cmdline-tools") {
+              Move-Item "$env:ANDROID_HOME\cmdline-tools\cmdline-tools" "$env:ANDROID_HOME\cmdline-tools\latest" -Force
+            }
+          }
+
+      - name: Accept Android licenses and install SDK components
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
           & "$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat" `
+            --sdk_root="$env:ANDROID_HOME" --licenses
+
+          & "$env:ANDROID_HOME\cmdline-tools\latest\bin\sdkmanager.bat" `
+            --sdk_root="$env:ANDROID_HOME" `
             "platform-tools" `
             "platforms;android-35" `
             "build-tools;35.0.0" `
@@ -60,6 +85,8 @@ jobs:
       - name: Prepare repo for Windows CI
         shell: pwsh
         run: |
+          $ErrorActionPreference = "Stop"
+
           Remove-Item -Force gradle/gradle-daemon-jvm.properties -ErrorAction SilentlyContinue
 
           $ndkRoot = Join-Path $env:ANDROID_HOME "ndk\29.0.13846066"
