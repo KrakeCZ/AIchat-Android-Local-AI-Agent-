@@ -59,9 +59,8 @@ jobs:
         sed -i 's|C:/Program Files/Android/Android Studio/jbr|'"$JAVA_HOME"'|g' gradle.properties
         # Nahradí Windows NDK glslc cestu systémovou linuxovou glslc binárkou
         sed -i 's|C:/Users/x/AppData/Local/Android/Sdk/ndk/29.0.13846066/shader-tools/windows-x86_64/glslc.exe|/usr/bin/glslc|g' whisper/src/main/cpp/CMakeLists.txt
-        # Vypne "Clean Room Workaround" na Linux CI, aby se shadery vygenerovaly dynamicky s Linux podporou (bfloat16 atd.)
-        sed -i 's|# --- CLEAN ROOM WORKAROUND FOR GGML-VULKAN ON WINDOWS ---|if(CMAKE_HOST_SYSTEM_NAME MATCHES "Windows")|g' whisper/src/main/cpp/CMakeLists.txt
-        sed -i 's|# --------------------------------------------------------|endif()|g' whisper/src/main/cpp/CMakeLists.txt
+        # ÚPLNĚ SMAŽE CLEAN ROOM WORKAROUND na Linuxu (protože v něm zůstalo include(ExternalProject), které narušovalo generátor)
+        sed -i '/# --- CLEAN ROOM WORKAROUND FOR GGML-VULKAN ON WINDOWS ---/,/# --------------------------------------------------------/d' whisper/src/main/cpp/CMakeLists.txt
 
     - name: Build with Gradle
       run: ./gradlew assembleDebug
