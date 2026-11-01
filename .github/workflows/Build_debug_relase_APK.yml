@@ -5,12 +5,16 @@ on:
   push:
     paths:
       - "examples/llama.android/**"
-      - ".github/workflows/build-llama.yml"
+      - ".github/workflows/Build_debug_relase_APK.yml"
 
 jobs:
   build-apk:
     runs-on: ubuntu-latest
     timeout-minutes: 90
+
+    env:
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      ANDROID_HOME: /usr/local/lib/android/sdk
 
     defaults:
       run:
@@ -26,27 +30,31 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Install Android SDK commandline tools
+        shell: bash
+        run: |
+          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
+          cd "$ANDROID_SDK_ROOT/cmdline-tools"
+          curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o cmdline-tools.zip
+          unzip -o -q cmdline-tools.zip
+          rm -rf latest
+          mv cmdline-tools latest
 
       - name: Install Android SDK packages
         shell: bash
         run: |
-          yes | "$ANDROID_HOME"/cmdline-tools/latest/bin/sdkmanager --licenses
-          "$ANDROID_HOME"/cmdline-tools/latest/bin/sdkmanager \
+          yes | "$ANDROID_SDK_ROOT"/cmdline-tools/latest/bin/sdkmanager --licenses
+          "$ANDROID_SDK_ROOT"/cmdline-tools/latest/bin/sdkmanager \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;36.1.0" \
             "cmake;3.22.1" \
             "ndk;29.0.13846066"
 
-      - name: Make download script executable
-        shell: bash
-        run: chmod +x ./scripts/download_models.sh
-
-      - name: Download required AI model assets
+      - name: Download required AI model files
         shell: bash
         run: |
+          chmod +x ./scripts/download_models.sh
           ./scripts/download_models.sh
 
       - name: Build debug APK
