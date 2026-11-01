@@ -49,13 +49,15 @@ jobs:
     - name: Accept Android SDK licenses
       run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
+    - name: Install Vulkan shader compiler (glslc)
+      run: sudo apt-get update && sudo apt-get install -y glslc
+
     - name: Patch local Windows paths for CI Linux environment
       run: |
         # Opraví hardcodovanou Java cestu v gradle.properties na CI $JAVA_HOME
         sed -i 's|C:/Program Files/Android/Android Studio/jbr|'"$JAVA_HOME"'|g' gradle.properties
-        # Opraví hardcodovanou Windows cestu na NDK glslc v CMakeLists.txt na Linux NDK
-        sed -i 's|C:/Users/x/AppData/Local/Android/Sdk|'"$ANDROID_HOME"'|g' whisper/src/main/cpp/CMakeLists.txt
-        sed -i 's|windows-x86_64/glslc.exe|linux-x86_64/glslc|g' whisper/src/main/cpp/CMakeLists.txt
+        # Nahradí Windows NDK glslc cestu systémovou linuxovou glslc binárkou
+        sed -i 's|C:/Users/x/AppData/Local/Android/Sdk/ndk/29.0.13846066/shader-tools/windows-x86_64/glslc.exe|/usr/bin/glslc|g' whisper/src/main/cpp/CMakeLists.txt
 
     - name: Build with Gradle
       run: ./gradlew assembleDebug -Porg.gradle.workers.max=2 --no-daemon
