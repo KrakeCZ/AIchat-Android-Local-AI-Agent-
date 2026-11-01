@@ -9,17 +9,16 @@ on:
 
 jobs:
   build-apk:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     timeout-minutes: 90
 
     defaults:
       run:
         working-directory: examples/llama.android
+
+    env:
+      ANDROID_SDK_ROOT: ${{ github.workspace }}\android-sdk
+      ANDROID_HOME: ${{ github.workspace }}\android-sdk
 
     steps:
       - name: Checkout repository
@@ -31,74 +30,56 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Configure Android SDK (cross-platform)
-        shell: bash
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        shell: pwsh
         run: |
-          set -e
+          $ErrorActionPreference = "Stop"
 
-          export ANDROID_SDK_ROOT="$RUNNER_TEMP/android-sdk"
-          export ANDROID_HOME="$ANDROID_SDK_ROOT"
-          mkdir -p "$ANDROID_SDK_ROOT"
+          $sdkRoot = "$env:ANDROID_SDK_ROOT"
+          if (-not (Test-Path $sdkRoot)) {
+            New-Item -ItemType Directory -Path $sdkRoot | Out-Null
+          }
 
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            export CLT_URL="https://dl.google.com/android/repository/commandlinetools-win-11076708_latest.zip"
-          else
-            export CLT_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
-          fi
+          $sdkManager = "$sdkRoot\cmdline-tools\latest\bin\sdkmanager.bat"
+          if (-not (Test-Path $sdkManager)) {
+            $sdkManager = "$sdkRoot\cmdline-tools\bin\sdkmanager.bat"
+          }
 
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          echo "ANDROID_HOME=$ANDROID_HOME"
-
-          cd "$RUNNER_TEMP"
-          curl -L --fail -o cmdline-tools.zip "$CLT_URL"
-          unzip -q -o cmdline-tools.zip
-
-          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
-          if [ -d "$RUNNER_TEMP/cmdline-tools" ]; then
-            rm -rf "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-            mv "$RUNNER_TEMP/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-          elif [ -d "$RUNNER_TEMP/cmdline-tools-linux" ]; then
-            rm -rf "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-            mv "$RUNNER_TEMP/cmdline-tools-linux" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-          else
-            echo "SDK commandline tools directory not found after unzip"
-            find "$RUNNER_TEMP" -maxdepth 3 -type d | sed -n '1,40p'
+          if (-not (Test-Path $sdkManager)) {
+            Write-Error "sdkmanager not found at $sdkManager"
             exit 1
-          fi
+          }
 
-          if [ ! -x "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
-            echo "sdkmanager not found at $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
-            exit 1
-          fi
-
-          yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_SDK_ROOT" --licenses
-          "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$ANDROID_SDK_ROOT" \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;36.1.0" \
-            "cmake;3.22.1" \
+          & $sdkManager --sdk_root="$sdkRoot" --licenses
+          & $sdkManager --sdk_root="$sdkRoot" `
+            "platform-tools" `
+            "platforms;android-35" `
+            "build-tools;36.1.0" `
+            "cmake;3.22.1" `
             "ndk;29.0.13846066"
 
-          printf 'sdk.dir=%s\n' "$ANDROID_SDK_ROOT" > local.properties
-          echo "Generated local.properties"
+          "sdk.dir=$sdkRoot" | Set-Content -Path "local.properties"
 
       - name: Download required AI model assets
         shell: bash
         run: |
           set -e
-          chmod +x ./scripts/download_models.sh
+          chmod +x ./scripts/download_models.sh || true
           ./scripts/download_models.sh
 
       - name: Build debug APK
-        shell: bash
+        shell: pwsh
         run: |
-          set -e
-          ./gradlew --no-daemon :app:assembleDebug
+          $ErrorActionPreference = "Stop"
+          .\gradlew.bat --no-daemon :app:assembleDebug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: llama-android-debug-apk-${{ matrix.os }}
+          name: llama-android-debug-apk-windows
           path: |
             examples/llama.android/app/build/outputs/apk/debug/app-debug.apk
             examples/llama.android/app/build/outputs/apk/debug/*.apk
