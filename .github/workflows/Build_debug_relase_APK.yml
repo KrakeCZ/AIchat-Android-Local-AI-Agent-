@@ -27,6 +27,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive # VELMI DŮLEŽITÉ pro stažení Vulkan-Headers a llama.cpp/whisper.cpp
+        lfs: true # NEZBYTNÉ pro stažení reálných souborů jako sherpa-onnx-1.12.34.aar
 
     - name: Set up JDK 21
       uses: actions/setup-java@v4
