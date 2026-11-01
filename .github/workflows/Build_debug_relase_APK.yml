@@ -61,14 +61,23 @@ jobs:
 
       - name: Configure Android SDK & NDK Links
         run: |
-          echo "Konfigurace NDK pro Android Gradle Plugin..."
+          NDK_PATH="${{ steps.setup-ndk.outputs.ndk-path }}"
+          echo "Používám NDK r29 z: $NDK_PATH"
           mkdir -p "$ANDROID_HOME/ndk"
           # Vytvoření symlinků pro přesnou shodu s ndkVersion deklarovanou v Gradle skriptech
-          ln -sfn "$ANDROID_NDK_HOME" "$ANDROID_HOME/ndk/29.0.13846066 rc3"
-          ln -sfn "$ANDROID_NDK_HOME" "$ANDROID_HOME/ndk/29.0.13846066"
-          ln -sfn "$ANDROID_NDK_HOME" "$ANDROID_HOME/ndk/29.0.13846066-beta3"
-          echo "ndk.dir=$ANDROID_NDK_HOME" >> local.properties
-          echo "sdk.dir=$ANDROID_HOME" >> local.properties
+          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/29.0.13846066 rc3"
+          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/29.0.13846066"
+          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/29.0.13846066-beta3"
+
+          # Vyčistit a správně nastavit local.properties s novým NDK r29
+          rm -f local.properties lib/local.properties whisper/local.properties app/local.properties
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          echo "ndk.dir=$NDK_PATH" >> local.properties
+
+          # Přepsat výchozí proměnné prostředí runneru (které ukazovaly na staré NDK 27)
+          echo "ANDROID_NDK_HOME=$NDK_PATH" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$NDK_PATH" >> $GITHUB_ENV
+          echo "ANDROID_NDK=$NDK_PATH" >> $GITHUB_ENV
 
       - name: Patch CI Configuration & Memory Limits
         run: |
