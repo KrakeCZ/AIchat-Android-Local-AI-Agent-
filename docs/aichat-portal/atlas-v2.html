@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="dark">
 <title>AIchat Code Atlas v2</title>
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
 <style>
 :root {
   --bg:#090e18; --panel:#111b2b; --card:#18263a;
@@ -73,10 +75,17 @@ input[type=color] {
 }
 .result small {display:block;font-size:11px}
 #graph {
+  position:relative;
   width:100%;height:calc(100dvh - 195px);min-height:440px;
   border:1px solid var(--border);border-radius:14px;
   background:radial-gradient(circle,#172940,var(--bg) 78%);
   touch-action:none;
+}
+#graph:fullscreen {
+  width:100vw;
+  height:100dvh;
+  border:0;
+  border-radius:0;
 }
 #graphStatus {padding:10px 0;font-size:12px;color:var(--good)}
 #proof {
@@ -114,6 +123,16 @@ input[type=color] {
 details[open] summary {margin-bottom:9px}
 summary {cursor:pointer}
 #sourceLink {overflow-wrap:anywhere}
+#exitFullscreen {
+  display:none;
+  position:absolute;
+  top:16px;
+  right:16px;
+  z-index:10;
+}
+#graph:fullscreen #exitFullscreen {
+  display:block;
+}
 @media(max-width:1100px) {
   main {grid-template-columns:225px minmax(0,1fr)}
   .inspector {
@@ -221,11 +240,14 @@ summary {cursor:pointer}
     <button id="fit">Přizpůsobit</button>
     <button id="zoomIn" aria-label="Přiblížit graf">＋</button>
     <button id="zoomOut" aria-label="Oddálit graf">－</button>
+    <button id="fullscreenBtn">⛶ Celá obrazovka</button>
     <button id="savePng">Uložit PNG</button>
     <button id="share">Kopírovat odkaz</button>
   </div>
 
-  <div id="graph" aria-label="Interaktivní graf zdrojových souborů"></div>
+  <div id="graph" aria-label="Interaktivní graf zdrojových souborů">
+    <button id="exitFullscreen" type="button">✕ Zavřít fullscreen</button>
+  </div>
   <div id="graphStatus" role="status">Načítám index…</div>
 
   <h3>Proč jsou propojené?</h3>
@@ -251,7 +273,7 @@ summary {cursor:pointer}
   <h3>Skutečný zdrojový kód</h3>
   <p id="codeStatus"></p>
   <button id="fullCode" hidden>Zobrazit celý soubor</button>
-  <pre id="code"></pre>
+  <pre><code id="code"></code></pre>
 </section>
 </main>
 
@@ -264,6 +286,7 @@ summary {cursor:pointer}
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.34.3/cytoscape.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
 <script>
 "use strict";
 
@@ -641,6 +664,37 @@ function inspect(path) {
   preview(path);
 }
 
+function showHighlightedCode(source, path) {
+  const code = document.getElementById("code");
+  const ext = path.split(".").pop().toLowerCase();
+
+  const languages = {
+    kt: "kotlin",
+    kts: "kotlin",
+    java: "java",
+    cpp: "cpp",
+    cc: "cpp",
+    c: "c",
+    h: "cpp",
+    hpp: "cpp",
+    py: "python",
+    xml: "xml",
+    js: "javascript",
+    json: "json",
+    sh: "bash"
+  };
+
+  const language = languages[ext] || "plaintext";
+
+  code.removeAttribute("data-highlighted");
+  code.className = `language-${language}`;
+  code.textContent = source;
+
+  if (window.hljs && hljs.getLanguage(language)) {
+    hljs.highlightElement(code);
+  }
+}
+
 async function preview(path) {
   const serial = ++sourceRequest;
   const code = $("code");
@@ -664,14 +718,15 @@ async function preview(path) {
       ).join("\n");
     }
 
-    code.textContent = numbered(lines.slice(0,250));
+    const numberedText = numbered(lines.slice(0,250));
+    showHighlightedCode(numberedText, path);
     $("codeStatus").textContent =
       `Zdrojový kód ze stejného commitu · ${lines.length} řádků`;
 
     if (lines.length>250) {
       $("fullCode").hidden = false;
       $("fullCode").onclick = () => {
-        code.textContent = numbered(fullText.split("\n"));
+        showHighlightedCode(numbered(fullText.split("\n")), path);
         $("fullCode").hidden = true;
       };
     }
@@ -821,6 +876,30 @@ $("savePng").onclick = ()=>{
   link.download = "aichat-code-atlas.png";
   link.click();
 };
+
+$("fullscreenBtn").onclick = async () => {
+  try {
+    if (!$("graph").requestFullscreen) {
+      throw new Error("Prohlížeč fullscreen nepodporuje.");
+    }
+    await $("graph").requestFullscreen();
+  } catch (err) {
+    $("graphStatus").textContent = err.message;
+  }
+};
+
+$("exitFullscreen").onclick = () => {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  }
+};
+
+document.addEventListener("fullscreenchange", () => {
+  requestAnimationFrame(() => {
+    cy?.resize();
+    cy?.fit(undefined, 45);
+  });
+});
 
 $("resetPalette").onclick = ()=>{
   nodeColors = {...NODE_DEFAULTS};
