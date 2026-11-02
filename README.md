@@ -1,14 +1,16 @@
 # 🦙 Android Local AI 
 OPEN-SOURCE/ MIT license ..
 
+** ENCYKLOPEDIA OF CODE ** 👇💻📲📚
 https://krakecz.github.io/AIchat-Android-Local-AI-Agent-/
 
-examples/llama.android local AI for android here 👇
+examples/llama.android PATH of 
+ local AI for android here 👇
 
 https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/tree/main/examples/llama.android
 
-early-access -> really early ... 
-kotlin layer👇
+early-access -> really early.. 
+kotlin layer find here👇
 https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/tree/main/examples/llama.android/app/src/main/java/com/example/llama
 
 **************************************************************************************************************
@@ -22,9 +24,9 @@ This repository includes a modified copy of llama.cpp and its Android integratio
 
 The full source tree is retained because some AIchat components depend on shared native libraries, build infrastructure, and code outside the Android example directory.
 
-AIchat is not an official llama.cpp release or an officially supported upstream application.
+AIchat is **not** an official llama.cpp release or an officially supported upstream application.
 
-👉Original llama.cpp project: https://github.com/ggml-org/llama.cpp 👈
+👉🌐 Original llama.cpp project: https://github.com/ggml-org/llama.cpp 🌐 👈
 
 Original copyright notices and applicable third-party licenses are preserved.
 
@@ -37,8 +39,9 @@ An advanced, fully on-device AI Agent for Android. This application acts as a sm
 [![Offline First](https://img.shields.io/badge/Offline-100%25-blue.svg)](#privacy)
 [![Build Android APK](https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/actions/workflows/Build_debug_relase_APK.yml/badge.svg)](https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/actions/workflows/Build_debug_relase_APK.yml)
 
-Android local AI Agent is a comprehensive, open-source assistive platform for Android that runs entirely locally without the need for cloud connectivity [1]. The application combines the power of local LLMs (Large Language Models), Computer Vision, audio processing, and advanced eye tracking (IrisMotion) to enable fully autonomous and hands-free device control [2, 3].
-​The project is designed as an "Assistive Technology" and places absolute emphasis on user data security. It contains no trackers and is an ideal candidate for distribution via F-Droid [1, 4].
+Android local AI Agent is a comprehensive, open-source assistive platform for Android that runs entirely locally without the need for cloud connectivity [1]. The application combines the power of local LLMs (Large Language Models), Computer Vision, audio processing, and advanced eye tracking (IrisMotion) to enable fully autonomous and hands-free device control [2, 3] in build.. **NOT AUTONOMOUS**
+​The project is designed as an "Assistive Technology" and places absolute emphasis on user data security. 
+APP USE INTERNET FOR LLM_CHAT_TOOLS [web_browser, web_search, read_url_context, download one time ML Kit 30MB vocab] 
 
 ## ✨ Main Function (Core Features)
 
