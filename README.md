@@ -9,9 +9,27 @@ early-access -> really early ...
 kotlin layer👇
 https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/tree/main/examples/llama.android/app/src/main/java/com/example/llama
 
+**************************************************************************************************************
+**************************************************************************************************************
+
+Upstream and attribution
+
+AIchat is an independent experimental Android application built on top of the open-source llama.cpp ecosystem.
+
+This repository includes a modified copy of llama.cpp and its Android integration, along with additional Android components, native integrations, and application-specific modules.
+
+The full source tree is retained because some AIchat components depend on shared native libraries, build infrastructure, and code outside the Android example directory.
+
+AIchat is not an official llama.cpp release or an officially supported upstream application.
+
+👉Original llama.cpp project: https://github.com/ggml-org/llama.cpp 👈
+
+Original copyright notices and applicable third-party licenses are preserved.
 
 An advanced, fully on-device AI Agent for Android. This application acts as a smart accessibility layer, understanding your screen context, listening to voice commands, and executing autonomous actions—all processed locally without sending your private data to the cloud.
 
+**************************************************************************************************************
+**************************************************************************************************************
 
 [![Platform: Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://android.com)
 [![Offline First](https://img.shields.io/badge/Offline-100%25-blue.svg)](#privacy)
@@ -27,6 +45,8 @@ An advanced, fully on-device AI Agent for Android. This application acts as a sm
 Platform: Android
 
 Offline First
+[LLM can use tools for web_search & web_browser & read_url_context] 
+ml_kist for translate use one time download 30MB vocabulary > sending telemetry blocked in manifest
 
 F-Droid Compatible
 **Android AI Agent** is a comprehensive, open-source assistive platform for Android that runs entirely locally without the need for cloud connectivity [1]. The application combines the power of local LLMs (Large Language Models), Computer Vision, audio processing, and advanced eye tracking (IrisMotion) to enable fully autonomous and hands-free device control [2, 3].
