@@ -36,6 +36,9 @@ jobs:
       - name: Generate source index
         run: python3 docs/aichat-portal/build_index.py
 
+      - name: Generate relationship graph
+        run: python3 docs/aichat-portal/build_graph.py
+
       - name: Upload static website
         uses: actions/upload-pages-artifact@v3
         with:
