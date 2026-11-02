@@ -1,6 +1,8 @@
 # 🦙 Android Local AI 
 OPEN-SOURCE/ MIT license ..
+
 https://krakecz.github.io/AIchat-Android-Local-AI-Agent-/
+
 examples/llama.android local AI for android here 👇
 
 https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/tree/main/examples/llama.android
