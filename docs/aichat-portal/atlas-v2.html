@@ -81,12 +81,6 @@ input[type=color] {
   background:radial-gradient(circle,#172940,var(--bg) 78%);
   touch-action:none;
 }
-#graph:fullscreen {
-  width:100vw;
-  height:100dvh;
-  border:0;
-  border-radius:0;
-}
 #graphStatus {padding:10px 0;font-size:12px;color:var(--good)}
 #proof {
   padding:12px;border:1px solid var(--border);
@@ -123,16 +117,6 @@ input[type=color] {
 details[open] summary {margin-bottom:9px}
 summary {cursor:pointer}
 #sourceLink {overflow-wrap:anywhere}
-#exitFullscreen {
-  display:none;
-  position:absolute;
-  top:16px;
-  right:16px;
-  z-index:10;
-}
-#graph:fullscreen #exitFullscreen {
-  display:block;
-}
 @media(max-width:1100px) {
   main {grid-template-columns:225px minmax(0,1fr)}
   .inspector {
@@ -240,14 +224,11 @@ summary {cursor:pointer}
     <button id="fit">Přizpůsobit</button>
     <button id="zoomIn" aria-label="Přiblížit graf">＋</button>
     <button id="zoomOut" aria-label="Oddálit graf">－</button>
-    <button id="fullscreenBtn">⛶ Celá obrazovka</button>
     <button id="savePng">Uložit PNG</button>
     <button id="share">Kopírovat odkaz</button>
   </div>
 
-  <div id="graph" aria-label="Interaktivní graf zdrojových souborů">
-    <button id="exitFullscreen" type="button">✕ Zavřít fullscreen</button>
-  </div>
+  <div id="graph" aria-label="Interaktivní graf zdrojových souborů"></div>
   <div id="graphStatus" role="status">Načítám index…</div>
 
   <h3>Proč jsou propojené?</h3>
@@ -358,17 +339,24 @@ function stored(key) {
 
 function persist() {
   try {
-    localStorage.setItem("aichat-atlas-v2",JSON.stringify({
-      nodeColors,edgeColors,
-      depth:$("depth").value,
-      direction:$("direction").value,
-      layout:$("layout").value,
-      maxNodes:$("maxNodes").value,
-      allowInferred:$("allowInferred").checked,
-      edgeTypes:[...document.querySelectorAll("[data-edge]")]
-        .filter(x=>x.checked).map(x=>x.dataset.edge)
+    const previous = stored("aichat-atlas-v2") || {};
+
+    localStorage.setItem("aichat-atlas-v2", JSON.stringify({
+      ...previous,
+      nodeColors,
+      edgeColors,
+      depth: $("depth").value,
+      direction: $("direction").value,
+      layout: $("layout").value,
+      maxNodes: $("maxNodes").value,
+      allowInferred: $("allowInferred").checked,
+      edgeTypes: [...document.querySelectorAll("[data-edge]")]
+        .filter(x => x.checked)
+        .map(x => x.dataset.edge)
     }));
-  } catch (_) {}
+  } catch (error) {
+    console.warn("Nastavení se nepodařilo uložit:", error);
+  }
 }
 
 function loadPreferences() {
@@ -876,30 +864,6 @@ $("savePng").onclick = ()=>{
   link.download = "aichat-code-atlas.png";
   link.click();
 };
-
-$("fullscreenBtn").onclick = async () => {
-  try {
-    if (!$("graph").requestFullscreen) {
-      throw new Error("Prohlížeč fullscreen nepodporuje.");
-    }
-    await $("graph").requestFullscreen();
-  } catch (err) {
-    $("graphStatus").textContent = err.message;
-  }
-};
-
-$("exitFullscreen").onclick = () => {
-  if (document.fullscreenElement) {
-    document.exitFullscreen();
-  }
-};
-
-document.addEventListener("fullscreenchange", () => {
-  requestAnimationFrame(() => {
-    cy?.resize();
-    cy?.fit(undefined, 45);
-  });
-});
 
 $("resetPalette").onclick = ()=>{
   nodeColors = {...NODE_DEFAULTS};
