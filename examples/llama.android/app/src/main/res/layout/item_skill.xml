@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="#242424"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="1dp"
+    app:strokeColor="#333333"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Header: Title, Badge, Switch -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tv_skill_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Skill Name"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_skill_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="#3300E676"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:text="Vestavěný"
+                android:textColor="#00E676"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switch_skill_enabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true" />
+        </LinearLayout>
+
+        <!-- Description -->
+        <TextView
+            android:id="@+id/tv_skill_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Description of the skill..."
+            android:textColor="#CCCCCC"
+            android:textSize="12sp" />
+
+        <!-- Triggers -->
+        <TextView
+            android:id="@+id/tv_skill_triggers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Spouštěče: research, analyzuj"
+            android:textColor="#888888"
+            android:textSize="11sp" />
+
+        <!-- Action bar: Edit / Delete -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="6dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_skill_edit"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:paddingHorizontal="8dp"
+                android:text="Zobrazit / Upravit"
+                android:textSize="11sp"
+                android:textColor="#29B6F6" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_skill_delete"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:paddingHorizontal="8dp"
+                android:text="Smazat"
+                android:textSize="11sp"
+                android:textColor="#FF5252" />
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

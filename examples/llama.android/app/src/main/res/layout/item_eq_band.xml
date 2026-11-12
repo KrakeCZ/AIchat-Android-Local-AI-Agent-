@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/tv_eq_freq"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:text="60Hz"
+        android:textColor="#BBBBBB"
+        android:textSize="12sp" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slider_eq_band"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:thumbTint="#4CAF50"
+        app:trackColorActive="#4CAF50"
+        app:trackColorInactive="#333333" />
+</LinearLayout>

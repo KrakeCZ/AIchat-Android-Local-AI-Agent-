@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Base.Theme.AiChatSample" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Customize your theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:statusBarColor">@android:color/black</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+    </style>
+
+    <style name="Theme.AiChatSample" parent="Base.Theme.AiChatSample" />
+    
+    <!-- Transparentní téma pro aktivity, co jen drží dialog -->
+    <style name="Theme.AiChatSample.Translucent" parent="Theme.AiChatSample">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+</resources>

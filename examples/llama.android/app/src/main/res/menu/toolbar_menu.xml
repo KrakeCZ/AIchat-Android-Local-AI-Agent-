@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/action_iris_motion" android:title="Iris" android:icon="@android:drawable/ic_menu_camera" app:showAsAction="always" />
+
+    <item android:id="@+id/action_smart_vision" android:title="SmartVision" android:icon="@android:drawable/ic_menu_view" app:showAsAction="always" />
+
+    <item android:id="@+id/action_attach_file" android:title="Attach File" android:icon="@drawable/ic_attach_file_24" app:showAsAction="always" />
+
+    <item android:id="@+id/action_agent" android:title="Agent" android:icon="@drawable/ic_smart_toy_24" app:showAsAction="always" />
+
+    <item android:id="@+id/action_load_model" android:title="@string/menu_load_model" android:icon="@drawable/outline_folder_open_24" app:showAsAction="always" />
+
+    <item android:id="@+id/action_eject_model" android:title="Eject Model" android:icon="@drawable/ic_stop_24" app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_export" android:title="Export Chat" android:icon="@android:drawable/ic_menu_save" app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_delete" android:title="@string/menu_delete_chat" android:icon="@android:drawable/ic_menu_delete" app:showAsAction="ifRoom" />
+
+    <!-- Omni-Control D: App Toolbar -->
+    <item android:id="@+id/action_toggle_vision" android:title="Vision: OFF" app:showAsAction="never" />
+    <item android:id="@+id/action_toggle_audio" android:title="Audio: OFF" app:showAsAction="never" />
+    <item android:id="@+id/action_toggle_ocr" android:title="OCR: OFF" app:showAsAction="never" />
+    <item android:id="@+id/action_toggle_summarization" android:title="Sum: OFF" app:showAsAction="never" />
+    <item android:id="@+id/action_toggle_transcript" android:title="Transcript: OFF" app:showAsAction="never" />
+</menu>

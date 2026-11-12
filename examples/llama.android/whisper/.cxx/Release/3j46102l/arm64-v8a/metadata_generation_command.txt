@@ -1,0 +1,28 @@
+                        -HC:\SS24_V3_OK_preAgent_\examples\llama.android\whisper\src\main\cpp
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_SYSTEM_VERSION=33
+-DANDROID_PLATFORM=android-33
+-DANDROID_ABI=arm64-v8a
+-DCMAKE_ANDROID_ARCH_ABI=arm64-v8a
+-DANDROID_NDK=C:\Users\x\AppData\Local\Android\Sdk\ndk\29.0.13846066
+-DCMAKE_ANDROID_NDK=C:\Users\x\AppData\Local\Android\Sdk\ndk\29.0.13846066
+-DCMAKE_TOOLCHAIN_FILE=C:\Users\x\AppData\Local\Android\Sdk\ndk\29.0.13846066\build\cmake\android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=C:\Users\x\AppData\Local\Android\Sdk\cmake\3.22.1\bin\ninja.exe
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=C:\SS24_V3_OK_preAgent_\examples\llama.android\whisper\build\intermediates\cxx\Release\3j46102l\obj\arm64-v8a
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=C:\SS24_V3_OK_preAgent_\examples\llama.android\whisper\build\intermediates\cxx\Release\3j46102l\obj\arm64-v8a
+-BC:\SS24_V3_OK_preAgent_\examples\llama.android\whisper\.cxx\Release\3j46102l\arm64-v8a
+-GNinja
+-DCMAKE_BUILD_TYPE=Release
+-DANDROID_STL=c++_shared
+-WHISPER_BUILD_EXAMPLES=OFF
+-WHISPER_BUILD_TESTS=OFF
+-WHISPER_BUILD_SERVER=OFF
+-DGGML_CUDA=OFF
+-DCMAKE_MESSAGE_LOG_LEVEL=DEBUG
+-DCMAKE_VERBOSE_MAKEFILE=ON
+-DBUILD_SHARED_LIBS=OFF
+-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384 -fvisibility=hidden
+-DCMAKE_MODULE_LINKER_FLAGS=-Wl,-z,max-page-size=16384 -fvisibility=hidden
+                        Build command args: [-v]
+                        Version: 2

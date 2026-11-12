@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- VoiceInteractionService metadata
+     Registruje app jako "Aplikace digitálního asistenta"
+     Reference: https://developer.android.com/reference/android/service/voice/VoiceInteractionService
+
+     settingsActivity: Odkaz na SettingsActivity pro konfiguraci asistenta
+     sessionService: Odkaz na SessionService pro vytváření interakčních sessions
+     supportsAssist: Povoluje AssistStructure (UI snapshot)
+     supportsLaunchVoiceAssistFromKeyguard: Povoluje spuštění z locked screen
+     supportsLocalInteraction: Povoluje lokální (offline) interakci — GGUF modely
+-->
+<voice-interaction-service
+   xmlns:android="http://schemas.android.com/apk/res/android"
+    android:sessionService="com.example.llama.agent.service.AiAgentSessionService"
+    android:recognitionService="com.example.llama.agent.service.AiAgentRecognitionService"
+    android:settingsActivity="com.example.llama.SettingsActivity"
+    android:supportsAssist="true"
+    android:supportsLaunchVoiceAssistFromKeyguard="true"
+    android:supportsLocalInteraction="true" />

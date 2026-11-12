@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#121212" android:fitsSystemWindows="true">
+
+    <!-- POZADÍ: Toolbar a Video -->
+    <LinearLayout android:id="@+id/backgroundLayout" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+
+        <androidx.appcompat.widget.Toolbar android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="?attr/actionBarSize" android:background="#1E1E1E" app:titleTextColor="@android:color/white" app:title="SRT Editor" app:navigationIcon="?attr/homeAsUpIndicator" />
+
+        <FrameLayout android:id="@+id/videoContainer" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#000000">
+            <androidx.media3.ui.PlayerView android:id="@+id/videoSurface" android:layout_width="match_parent" android:layout_height="match_parent" app:use_controller="false" app:surface_type="surface_view" />
+            <com.example.llama.srt.ui.views.SubtitleOverlayView android:id="@+id/subtitleOverlay" android:layout_width="match_parent" android:layout_height="match_parent" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/fabPlayPause" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:src="@android:drawable/ic_media_pause" app:backgroundTint="#88000000" app:tint="@android:color/white" app:elevation="0dp" android:visibility="gone" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- BOTTOM SHEET: Taby a Kontejnery -->
+    <LinearLayout android:id="@+id/bottomSheetLayout" android:layout_width="match_parent" android:layout_height="420dp" android:orientation="vertical" android:background="#121212" app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior" app:behavior_peekHeight="110dp" app:behavior_hideable="false">
+
+        <!-- Drag handle -->
+        <View android:layout_width="48dp" android:layout_height="4dp" android:layout_gravity="center_horizontal" android:layout_marginTop="8dp" android:layout_marginBottom="8dp" android:background="#444444" />
+
+        <androidx.compose.ui.platform.ComposeView android:id="@+id/compose_timeline_view" android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+        <com.google.android.material.tabs.TabLayout android:id="@+id/tabLayoutMode" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="#1E1E1E" app:tabMode="scrollable" app:tabTextColor="#888888" app:tabSelectedTextColor="@android:color/white" app:tabIndicatorColor="#2196F3" app:tabGravity="start" />
+
+        <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent">
+
+            <!-- ── TIMELINE CONTAINER ── -->
+            <LinearLayout android:id="@+id/timelineContainer" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:visibility="visible" android:background="#121212">
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvSrtBlocks" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:clipToPadding="false" android:paddingTop="4dp" android:paddingBottom="4dp" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:background="#1E1E1E" android:padding="8dp">
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnTranslate" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="2dp" android:text="Jazyk (ML Kit)" android:textColor="#2196F3" android:textSize="12sp" app:strokeColor="#2196F3" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnVfrAutofix" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="2dp" android:layout_marginEnd="2dp" android:text="VFR Sync" android:textColor="#E91E63" android:textSize="12sp" app:strokeColor="#E91E63" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnFormatting" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="2dp" android:text="Formát" android:textColor="#FF9800" android:textSize="12sp" app:strokeColor="#FF9800" />
+                </LinearLayout>
+                
+                <!-- Globální Posun -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:background="#161616" android:gravity="center" android:padding="8dp">
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnShiftGlobalMinus" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="– 25ms" android:textColor="#AAAAAA" app:strokeColor="#444444" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Globální Posun (Shift)" android:textColor="#AAAAAA" android:textSize="12sp" android:gravity="center" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnShiftGlobalPlus" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="+ 25ms" android:textColor="#AAAAAA" app:strokeColor="#444444" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── STYL CONTAINER (NestedScrollView all-in-one) ── -->
+            <androidx.core.widget.NestedScrollView android:id="@+id/styleCarouselContainer" android:layout_width="match_parent" android:layout_height="match_parent" android:visibility="gone" android:background="#121212">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="12dp">
+
+                    <!-- Šablony -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Šablony a Styly" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" />
+                        <com.google.android.material.button.MaterialButton android:id="@+id/btnImportTemplate" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Import" android:textColor="#2196F3" />
+                        <com.google.android.material.button.MaterialButton android:id="@+id/btnExportTemplate" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Export" android:textColor="#4CAF50" />
+                    </LinearLayout>
+                    <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvStyleCarousel" android:layout_width="match_parent" android:layout_height="wrap_content" android:clipToPadding="false" android:orientation="horizontal" android:layout_marginBottom="16dp" />
+
+                    <!-- Barva textu -->
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Barva textu" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="6dp" />
+                    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none" android:layout_marginBottom="16dp">
+                        <LinearLayout android:id="@+id/colorPickerRow" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                            <!-- Paleta první -->
+                            <com.google.android.material.button.MaterialButton android:id="@+id/btnColorPicker" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="44dp" android:layout_height="44dp" android:layout_marginEnd="6dp" android:padding="0dp" android:text="🎨" android:textSize="18sp" app:cornerRadius="22dp" app:strokeColor="#555555" />
+                            <!-- Předdefinované barvy -->
+                            <View android:id="@+id/colorBtnWhite" android:layout_width="36dp" android:layout_height="36dp" android:layout_marginEnd="6dp" android:background="@drawable/circle_color_white" />
+                            <View android:id="@+id/colorBtnBlack" android:layout_width="36dp" android:layout_height="36dp" android:layout_marginEnd="6dp" android:background="@drawable/circle_color_black" />
+                            <View android:id="@+id/colorBtnYellow" android:layout_width="36dp" android:layout_height="36dp" android:layout_marginEnd="6dp" android:background="@drawable/circle_color_yellow" />
+                            <View android:id="@+id/colorBtnNeon" android:layout_width="36dp" android:layout_height="36dp" android:layout_marginEnd="6dp" android:background="@drawable/circle_color_neon" />
+                            <View android:id="@+id/colorBtnOrange" android:layout_width="36dp" android:layout_height="36dp" android:layout_marginEnd="6dp" android:background="@drawable/circle_color_orange" />
+                            <View android:id="@+id/colorBtnGreen" android:layout_width="36dp" android:layout_height="36dp" android:layout_marginEnd="6dp" android:background="@drawable/circle_color_green" />
+                            <View android:id="@+id/colorBtnBlue" android:layout_width="36dp" android:layout_height="36dp" android:layout_marginEnd="6dp" android:background="@drawable/circle_color_blue" />
+                            <View android:id="@+id/colorBtnPink" android:layout_width="36dp" android:layout_height="36dp" android:layout_marginEnd="6dp" android:background="@drawable/circle_color_pink" />
+                            <View android:id="@+id/colorBtnPurple" android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/circle_color_purple" />
+                        </LinearLayout>
+                    </HorizontalScrollView>
+
+                    <!-- Velikost textu -->
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Velikost textu" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="4dp" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+                        <SeekBar android:id="@+id/seekBarTextSize" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:min="12" android:max="120" android:progress="36" />
+                        <TextView android:id="@+id/tvTextSizeValue" android:layout_width="48dp" android:layout_height="wrap_content" android:text="36sp" android:textColor="#FFFFFF" android:textSize="12sp" android:gravity="end" />
+                    </LinearLayout>
+
+                    <!-- Barva pozadí -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Pozadí textu" android:textColor="#FFFFFF" android:textSize="14sp" />
+                        <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchBackground" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    </LinearLayout>
+                    <LinearLayout android:id="@+id/bgOptionsContainer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:layout_marginBottom="16dp">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Krytí:" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginEnd="8dp" />
+                            <SeekBar android:id="@+id/seekBarBgAlpha" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:max="100" android:progress="50" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Formátování textu -->
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Formátování" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="8dp" />
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Vše velkým (All Caps)" android:textColor="#FFFFFF" android:textSize="14sp" />
+                        <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchAllCaps" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <!-- Obrys -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Obrys textu (Stroke)" android:textColor="#FFFFFF" android:textSize="14sp" />
+                        <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchStroke" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    </LinearLayout>
+                    <LinearLayout android:id="@+id/strokeOptionsContainer" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:layout_marginBottom="16dp">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Síla:" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginEnd="8dp" />
+                            <SeekBar android:id="@+id/seekBarStroke" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:max="24" android:progress="4" />
+                            <TextView android:id="@+id/tvStrokeValue" android:layout_width="40dp" android:layout_height="wrap_content" android:text="4px" android:textColor="#FFFFFF" android:textSize="12sp" android:gravity="end" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Tučné a Kurzíva -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="16dp">
+                        <com.google.android.material.button.MaterialButton android:id="@+id/btnBold" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="B  Tučné" android:textStyle="bold" app:strokeColor="#555555" />
+                        <com.google.android.material.button.MaterialButton android:id="@+id/btnItalic" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="4dp" android:text="I  Kurzíva" android:textStyle="italic" app:strokeColor="#555555" />
+                    </LinearLayout>
+
+                    <!-- Stín -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Stín textu" android:textColor="#FFFFFF" android:textSize="14sp" />
+                        <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchShadow" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <!-- Kognitivní Přístupnost -->
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" android:layout_marginBottom="8dp" android:layout_marginTop="8dp" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Kognitivní Přístupnost (WCAG)" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:layout_marginBottom="8dp" />
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Aktivní blok (Bounding Box)" android:textColor="#FFFFFF" android:textSize="14sp" />
+                        <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchActiveWordBg" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    </LinearLayout>
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Udrží pozornost podbarvením aktuálního slova (skvělé k Word Popu)." android:textColor="#AAAAAA" android:textSize="11sp" android:layout_marginBottom="12dp" />
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="16dp">
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Pevný kotevní bod (Anchor Line)" android:textColor="#FFFFFF" android:textSize="14sp" android:layout_marginBottom="4dp" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Brání očím ztratit se při skákajících titulcích." android:textColor="#AAAAAA" android:textSize="11sp" android:layout_marginBottom="6dp" />
+                        <Spinner android:id="@+id/spinnerAnchorLine" android:layout_width="match_parent" android:layout_height="wrap_content" android:backgroundTint="#FFFFFF" />
+                    </LinearLayout>
+
+                    <!-- Použít jako šablonu -->
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnSaveSrt" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Uložit jako vlastní šablonu" android:textColor="@android:color/white" app:backgroundTint="#2196F3" />
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+
+            <!-- ── TEXT CONTAINER ── -->
+            <LinearLayout android:id="@+id/textEditorContainer" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="12dp" android:visibility="gone" android:background="#1E1E1E">
+                <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Text titulku" app:boxBackgroundMode="outline" app:boxStrokeColor="#2196F3">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/editTextSubtitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@android:color/white" android:inputType="textMultiLine" android:minLines="2" android:maxLines="4" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <!-- Formátování -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="12dp">
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnCapsNone" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="–" app:strokeColor="#555555" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnCapsAll" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="TT" android:textAllCaps="false" app:strokeColor="#555555" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnCapsLower" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginEnd="4dp" android:text="tt" android:textAllCaps="false" app:strokeColor="#555555" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnCapsTitle" style="@style/Widget.MaterialComponents.Button.OutlinedButton" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Tt" android:textAllCaps="false" app:strokeColor="#555555" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── ANIMACE CONTAINER ── -->
+            <LinearLayout android:id="@+id/animationContainer" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="8dp" android:visibility="gone" android:background="#121212">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Kinetic Animace" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:padding="8dp" />
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvAnimationList" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:clipToPadding="false" android:padding="8dp" />
+                <!-- Rychlost animace -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:padding="8dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rychlost:" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginEnd="8dp" />
+                    <SeekBar android:id="@+id/seekBarAnimSpeed" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:max="10" android:progress="5" />
+                    <TextView android:id="@+id/tvAnimSpeedValue" android:layout_width="40dp" android:layout_height="wrap_content" android:text="1.0x" android:textColor="#FFFFFF" android:textSize="12sp" android:gravity="end" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ── PÍSMO CONTAINER ── -->
+            <LinearLayout android:id="@+id/fontContainer" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="8dp" android:visibility="gone" android:background="#121212">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Písma (Fonty)" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:paddingStart="8dp" />
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnImportFont" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📥 Import TTF/OTF" android:textColor="#4CAF50" />
+                </LinearLayout>
+                <!-- Náhled fontu přesunut nad grid -->
+                <TextView android:id="@+id/tvFontPreview" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp" android:text="Abc 123 — Ukázka textu" android:textColor="#FFFFFF" android:textSize="28sp" android:gravity="center" />
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvFontList" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:clipToPadding="false" android:paddingStart="4dp" android:paddingEnd="4dp" />
+            </LinearLayout>
+
+            <!-- ── POZICE CONTAINER ── -->
+            <androidx.core.widget.NestedScrollView android:id="@+id/positionContainer" android:layout_width="match_parent" android:layout_height="match_parent" android:visibility="gone" android:background="#1E1E1E">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Svislá pozice (Y)" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="4dp" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+                        <SeekBar android:id="@+id/seekBarPosY" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:max="100" android:progress="80" />
+                        <TextView android:id="@+id/tvPosYValue" android:layout_width="40dp" android:layout_height="wrap_content" android:text="80%" android:textColor="#FFFFFF" android:textSize="12sp" android:gravity="end" />
+                    </LinearLayout>
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Vodorovná pozice (X)" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="4dp" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+                        <SeekBar android:id="@+id/seekBarPosX" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:max="100" android:progress="50" />
+                        <TextView android:id="@+id/tvPosXValue" android:layout_width="40dp" android:layout_height="wrap_content" android:text="50%" android:textColor="#FFFFFF" android:textSize="12sp" android:gravity="end" />
+                    </LinearLayout>
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Okraje (L/P)" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="4dp" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+                        <SeekBar android:id="@+id/seekBarMargin" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:max="64" android:progress="24" />
+                        <TextView android:id="@+id/tvMarginValue" android:layout_width="40dp" android:layout_height="wrap_content" android:text="24dp" android:textColor="#FFFFFF" android:textSize="12sp" android:gravity="end" />
+                    </LinearLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#333333" android:layout_marginBottom="16dp" />
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="3D Transformace" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" android:layout_marginBottom="8dp" />
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Rotace Y (stranou)" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="4dp" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+                        <SeekBar android:id="@+id/seekBarRotY" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:max="180" android:progress="90" />
+                        <TextView android:id="@+id/tvRotYValue" android:layout_width="40dp" android:layout_height="wrap_content" android:text="0°" android:textColor="#FFFFFF" android:textSize="12sp" android:gravity="end" />
+                    </LinearLayout>
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Rotace X (náklon)" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="4dp" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+                        <SeekBar android:id="@+id/seekBarRotX" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:max="180" android:progress="90" />
+                        <TextView android:id="@+id/tvRotXValue" android:layout_width="40dp" android:layout_height="wrap_content" android:text="0°" android:textColor="#FFFFFF" android:textSize="12sp" android:gravity="end" />
+                    </LinearLayout>
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Hloubka 3D stínu" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="4dp" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+                        <SeekBar android:id="@+id/seekBarShadow3d" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:max="30" android:progress="0" />
+                        <TextView android:id="@+id/tvShadow3dValue" android:layout_width="40dp" android:layout_height="wrap_content" android:text="0px" android:textColor="#FFFFFF" android:textSize="12sp" android:gravity="end" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+
+            <!-- ── EXPORT CONTAINER ── -->
+            <androidx.core.widget.NestedScrollView android:id="@+id/exportContainer" android:layout_width="match_parent" android:layout_height="match_parent" android:visibility="gone" android:background="#1E1E1E">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Export Videa" android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold" android:layout_marginBottom="16dp" />
+
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="16dp">
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Bitrate 1:1 klon originálu" android:textColor="#FFFFFF" android:textSize="14sp" />
+                        <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchExport1To1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" />
+                    </LinearLayout>
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Pipeline Debugger (Engine)" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="8dp" />
+                    <Spinner android:id="@+id/spinnerExportPipeline" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginBottom="16dp" android:background="#222222" />
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Video Kodek (Formát komprese)" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="8dp" />
+                    <Spinner android:id="@+id/spinnerExportCodec" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginBottom="16dp" android:background="#222222" />
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Výstupní kontejner (Přípona)" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="8dp" />
+                    <Spinner android:id="@+id/spinnerExportContainer" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginBottom="16dp" android:background="#222222" />
+
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Kvalita obrazu (Bitrate / CRF)" android:textColor="#AAAAAA" android:textSize="12sp" android:layout_marginBottom="8dp" />
+                    <Spinner android:id="@+id/spinnerExportQuality" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginBottom="16dp" android:background="#222222" />
+
+                    <!-- Thermal Mode / CPU Preset -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="16dp">
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Thermal &amp; Výkon Mode (FFmpeg Zátěž)" android:textColor="#FFFFFF" android:textSize="14sp" />
+                        <TextView android:id="@+id/tvThermalDesc" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Omezuje zahřívání telefonu během exportu." android:textColor="#888888" android:textSize="11sp" android:layout_marginBottom="8dp" />
+                        <Spinner android:id="@+id/spinnerExportThermal" android:layout_width="match_parent" android:layout_height="48dp" android:background="#222222" />
+                    </LinearLayout>
+
+                    <!-- HW / SW Akcelerace přepínač -->
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="24dp">
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="HW Akcelerace (MediaCodec)" android:textColor="#FFFFFF" android:textSize="14sp" />
+                            <TextView android:id="@+id/tvHwAccelDesc" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Dekodér + Enkodér přes GPU/VPU" android:textColor="#888888" android:textSize="11sp" />
+                        </LinearLayout>
+                        <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchHwAccel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" />
+                    </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton android:id="@+id/btnExportBurnIn" android:layout_width="match_parent" android:layout_height="56dp" android:text="Vyexportovat a vypsat titulky do videa" android:textColor="@android:color/white" app:backgroundTint="#4CAF50" app:cornerRadius="8dp" />
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+
+        </FrameLayout>
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

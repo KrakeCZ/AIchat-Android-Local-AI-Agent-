@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Smart Caption Overlay Layout (Enterprise-Grade A11y)
+    ====================================================
+    - Poloprůhledný černý panel s rounded corners
+    - Vysoký kontrast textu (bílá na černé, poměr > 7:1)
+    - Škálovatelné písmo (sp) — respektuje systémová nastavení
+    - Drag handle nahoře pro přesun celého panelu
+    - Pinch-to-Zoom pro uživatelské přizpůsobení velikosti textu
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/caption_root" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="0dp">
+
+    <LinearLayout android:id="@+id/caption_container" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/caption_overlay_bg" android:elevation="4dp" android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingBottom="12dp" android:paddingTop="4dp">
+
+        <!-- Drag Handle (viditelný proužek nahoře pro indikaci přetažení) -->
+        <View android:id="@+id/caption_drag_handle" android:layout_width="48dp" android:layout_height="4dp" android:layout_gravity="center_horizontal" android:layout_marginTop="6dp" android:layout_marginBottom="8dp" android:background="@drawable/caption_drag_handle_bg" android:contentDescription="Přetáhněte pro přesun titulků" />
+
+        <!-- Hlavní text titulků -->
+        <TextView android:id="@+id/caption_text" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="18sp" android:lineSpacingMultiplier="1.3" android:maxLines="11" android:ellipsize="start" android:fontFamily="sans-serif-medium" android:shadowColor="#000000" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="3" android:gravity="start" android:text="" android:importantForAccessibility="yes" android:accessibilityLiveRegion="polite" />
+
+        <!-- Mini status řádek: jazyk + zoom úroveň -->
+        <TextView android:id="@+id/caption_status" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="end" android:textColor="#80FFFFFF" android:textSize="10sp" android:layout_marginTop="4dp" android:text="CZ/EN • 18sp" android:importantForAccessibility="no" />
+
+    </LinearLayout>
+
+</FrameLayout>

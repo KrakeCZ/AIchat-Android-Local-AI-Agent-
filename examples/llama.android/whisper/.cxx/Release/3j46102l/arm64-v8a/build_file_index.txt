@@ -1,0 +1,7 @@
+C:\SS24_V3_OK_preAgent_\examples\llama.android\lib\src\main\cpp\whisper.cpp\CMakeLists.txt
+C:\SS24_V3_OK_preAgent_\examples\llama.android\lib\src\main\cpp\whisper.cpp\ggml\CMakeLists.txt
+C:\SS24_V3_OK_preAgent_\examples\llama.android\lib\src\main\cpp\whisper.cpp\ggml\src\CMakeLists.txt
+C:\SS24_V3_OK_preAgent_\examples\llama.android\lib\src\main\cpp\whisper.cpp\ggml\src\ggml-cpu\CMakeLists.txt
+C:\SS24_V3_OK_preAgent_\examples\llama.android\lib\src\main\cpp\whisper.cpp\ggml\src\ggml-vulkan\CMakeLists.txt
+C:\SS24_V3_OK_preAgent_\examples\llama.android\lib\src\main\cpp\whisper.cpp\src\CMakeLists.txt
+C:\SS24_V3_OK_preAgent_\examples\llama.android\whisper\src\main\cpp\CMakeLists.txt

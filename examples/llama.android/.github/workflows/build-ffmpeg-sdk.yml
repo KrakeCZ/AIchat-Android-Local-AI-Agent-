@@ -1,0 +1,493 @@
+name: Enterprise FFmpeg Android SDK
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - abi: arm64-v8a
+            target: aarch64-linux-android
+            arch: aarch64
+            cpu: armv8-a
+            x264_host: aarch64-linux
+          - abi: x86_64
+            target: x86_64-linux-android
+            arch: x86_64
+            cpu: x86-64
+            x264_host: x86_64-linux
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+            sudo apt-get install -y autoconf automake build-essential cmake curl git libtool make meson nasm ninja-build pkg-config python3 python3-pip texinfo yasm unzip zip gperf patchelf
+
+      - name: Setup Android NDK r29
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r29
+          add-to-path: true
+
+      - name: Verify NDK Setup
+        run: |
+          echo "ANDROID_NDK_HOME: $ANDROID_NDK_HOME"
+          ls -la "$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin/" | grep clang
+
+      - name: Build all libraries
+        shell: bash
+        env:
+          ABI: ${{ matrix.abi }}
+          TARGET: ${{ matrix.target }}
+          ARCH: ${{ matrix.arch }}
+          CPU: ${{ matrix.cpu }}
+          X264_HOST: ${{ matrix.x264_host }}
+        run: |
+          set -euo pipefail
+          export API=24
+          export NDK="${ANDROID_NDK_HOME}"
+          export TOOLCHAIN="$NDK/toolchains/llvm/prebuilt/linux-x86_64"
+          export SYSROOT="$TOOLCHAIN/sysroot"
+          export CC="$TOOLCHAIN/bin/${TARGET}${API}-clang"
+          export CXX="$TOOLCHAIN/bin/${TARGET}${API}-clang++"
+          export AR="$TOOLCHAIN/bin/llvm-ar"
+          export AS="$CC"
+          export RANLIB="$TOOLCHAIN/bin/llvm-ranlib"
+          export STRIP="$TOOLCHAIN/bin/llvm-strip"
+          export NM="$TOOLCHAIN/bin/llvm-nm"
+          export PREFIX="$GITHUB_WORKSPACE/prebuilt/$ABI"
+          export OUTPUT="$GITHUB_WORKSPACE/output/$ABI"
+          export SRC="$GITHUB_WORKSPACE/src"
+          mkdir -p "$PREFIX" "$OUTPUT" "$SRC"
+          export PATH="$TOOLCHAIN/bin:$PATH"
+          export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig"
+          export PKG_CONFIG_LIBDIR="$PREFIX/lib/pkgconfig"
+          unset PKG_CONFIG_SYSROOT_DIR || true
+          NDK_LIBCXX_BASE="$SYSROOT/usr/lib/$TARGET"
+          CROSS_FILE="$SRC/android-cross-$ABI.txt"
+                   
+          echo "STEP Freetype pass 1"
+          cd "$SRC"
+          curl -L "https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.gz" -o ft.tar.gz
+          tar xf ft.tar.gz
+          cd freetype-2.14.3
+          ./configure --prefix="$PREFIX" --host="$TARGET" --disable-shared --enable-static --with-zlib=no --with-png=no --with-bzip2=no --with-brotli=no --with-harfbuzz=no CFLAGS="-O3 -fPIC -ftls-model=global-dynamic"
+          make -j"$(nproc)"
+          make install
+
+          echo "STEP HarfBuzz"
+          cd "$SRC"
+          curl -L "https://github.com/harfbuzz/harfbuzz/releases/download/10.1.0/harfbuzz-10.1.0.tar.xz" -o hb.tar.xz
+          tar xf hb.tar.xz
+          cd harfbuzz-10.1.0
+          CROSS_FILE="$SRC/android-cross-$ABI.txt"
+          {
+            printf '%s\n' "[binaries]"
+            printf "c = '%s'\n" "$CC"
+            printf "cpp = '%s'\n" "$CXX"
+            printf "ar = '%s'\n" "$AR"
+            printf "strip = '%s'\n" "$STRIP"
+            printf '%s\n' "pkgconfig = 'pkg-config'"
+            printf '\n'
+            printf '%s\n' "[host_machine]"
+            printf '%s\n' "system = 'android'"
+            printf "cpu_family = '%s'\n" "$ARCH"
+            printf "cpu = '%s'\n" "$CPU"
+            printf '%s\n' "endian = 'little'"
+            printf '\n'
+            printf '%s\n' "[properties]"
+            printf "pkg_config_libdir = '%s/lib/pkgconfig'\n" "$PREFIX"
+          } > "$CROSS_FILE"
+          mkdir -p build && cd build
+          meson setup .. --cross-file "$CROSS_FILE" --prefix="$PREFIX" --buildtype=release --default-library=both \
+            -Dfreetype=enabled -Dglib=disabled -Dgobject=disabled -Dcairo=disabled -Dicu=disabled \
+            -Dtests=disabled -Ddocs=disabled -Dutilities=disabled \
+            -Dc_args="-I$PREFIX/include -I$PREFIX/include/freetype2 -fPIC -ftls-model=global-dynamic -femulated-tls" \
+            -Dcpp_args="-I$PREFIX/include -I$PREFIX/include/freetype2 -fPIC -ftls-model=global-dynamic -femulated-tls" \
+            -Dc_link_args="-L$PREFIX/lib -Wl,-z,max-page-size=16384 -femulated-tls" \
+            -Dcpp_link_args="-L$PREFIX/lib -Wl,-z,max-page-size=16384 -femulated-tls"
+          ninja -j"$(nproc)"
+          ninja install
+
+          echo "STEP Freetype pass 2"
+          cd "$SRC/freetype-2.14.3"
+          make distclean || true
+          ./configure --prefix="$PREFIX" --host="$TARGET" --disable-shared --enable-static --with-zlib=no --with-png=no --with-bzip2=no --with-brotli=no --with-harfbuzz=yes CFLAGS="-O3 -fPIC -ftls-model=global-dynamic -femulated-tls -I$PREFIX/include/harfbuzz" LDFLAGS="-L$PREFIX/lib -Wl,-z,max-page-size=16384 -femulated-tls" LIBS="-lharfbuzz"
+          make -j"$(nproc)"
+          make install
+
+          echo "STEP Fribidi"
+          cd "$SRC"
+          curl -L "https://github.com/fribidi/fribidi/releases/download/v1.0.15/fribidi-1.0.15.tar.xz" -o fb.tar.xz
+          tar xf fb.tar.xz
+          cd fribidi-1.0.15
+          mkdir -p build && cd build
+          meson setup .. --cross-file "$CROSS_FILE" --prefix="$PREFIX" --buildtype=release --default-library=both \
+            -Ddocs=false -Dtests=false -Dbin=false \
+            -Dc_args="-I$PREFIX/include -fPIC -ftls-model=global-dynamic -femulated-tls" \
+            -Dc_link_args="-L$PREFIX/lib -Wl,-z,max-page-size=16384 -femulated-tls"
+          ninja -j"$(nproc)"
+          ninja install
+
+          echo "STEP Libass"
+          cd "$SRC"
+          curl -L "https://github.com/libass/libass/releases/download/0.17.3/libass-0.17.3.tar.gz" -o ass.tar.gz
+          tar xf ass.tar.gz
+          cd libass-0.17.3
+          ./configure --prefix="$PREFIX" --host="$TARGET" --build=x86_64-pc-linux-gnu --disable-shared --enable-static --disable-fontconfig --disable-require-system-font-provider CFLAGS="-O3 -fPIC -ftls-model=global-dynamic -femulated-tls -I$PREFIX/include -I$PREFIX/include/freetype2 -I$PREFIX/include/harfbuzz -I$PREFIX/include/fribidi" LDFLAGS="-L$PREFIX/lib -Wl,-z,max-page-size=16384 -femulated-tls"
+          make -j"$(nproc)"
+          make install
+
+
+          echo "STEP libaom (AV1 Encoder/Decoder)"
+          cd "$SRC"
+          git clone --depth=1 https://aomedia.googlesource.com/aom
+          mkdir -p aom_build && cd aom_build
+          cmake -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake \
+                -DANDROID_ABI=$ABI -DANDROID_PLATFORM=android-$API \
+                -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+                -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+                -DBUILD_SHARED_LIBS=OFF -DENABLE_TESTS=OFF -DENABLE_EXAMPLES=OFF -DENABLE_TOOLS=OFF \
+                ../aom
+          make -j"$(nproc)" && make install
+
+          echo "STEP Opus"
+          cd "$SRC"
+          curl -L "https://downloads.xiph.org/releases/opus/opus-1.5.2.tar.gz" -o opus.tar.gz
+          tar xf opus.tar.gz
+          cd opus-1.5.2
+          ./configure --prefix="$PREFIX" --host="$TARGET" --build=x86_64-pc-linux-gnu --disable-shared --enable-static --disable-extra-programs --disable-doc CFLAGS="-O3 -fPIC -ftls-model=global-dynamic -femulated-tls" LDFLAGS="-Wl,-z,max-page-size=16384 -femulated-tls"
+          make -j"$(nproc)"
+          make install
+          
+
+          echo "STEP dav1d (AV1 Decoder)"
+          cd "$SRC"
+          git clone --depth=1 https://code.videolan.org/videolan/dav1d.git
+          cd dav1d
+          mkdir build && cd build
+          meson setup .. --cross-file "$CROSS_FILE" --prefix="$PREFIX" --default-library=static
+          ninja && ninja install
+
+          echo "STEP SVT-AV1 (AV1 Encoder)"
+          cd "$SRC"
+          git clone --depth=1 https://gitlab.com/AOMediaCodec/SVT-AV1.git
+          cd SVT-AV1/Build/linux
+          cmake -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake \
+                -DANDROID_ABI=$ABI -DANDROID_PLATFORM=android-$API \
+                -DBUILD_SHARED_LIBS=OFF \
+                -DENABLE_SHARED=OFF \
+                -DCMAKE_INSTALL_PREFIX="$PREFIX" ../..
+          make -j"$(nproc)" && make install
+          
+          echo "STEP LAME (MP3 Encoder)"
+          cd "$SRC"
+          curl -L "https://sourceforge.net/projects/lame/files/lame/3.100/lame-3.100.tar.gz/download" -o lame.tar.gz
+          tar xf lame.tar.gz
+          cd lame-3.100
+          ./configure --prefix="$PREFIX" --host="$TARGET" --disable-shared --enable-static --disable-frontend CFLAGS="-O3 -fPIC"
+          make -j"$(nproc)" && make install
+
+          echo "STEP libvpx (VP8/VP9)"
+          cd "$SRC"
+          git clone --depth=1 https://chromium.googlesource.com/webm/libvpx.git
+          
+          (
+            cd libvpx
+            VPX_TARGET=""
+            if [ "$ARCH" = "aarch64" ]; then VPX_TARGET="arm64-android-gcc"; fi
+            if [ "$ARCH" = "x86_64" ]; then VPX_TARGET="x86_64-android-gcc"; fi
+          
+            unset AS 
+            ./configure --prefix="$PREFIX" --target="$VPX_TARGET" --enable-pic --extra-cflags="-fPIC" --disable-shared --enable-static --disable-examples --disable-tools --disable-docs --disable-unit-tests
+            make -j"$(nproc)"
+            make install
+            )
+            
+          echo "=== HUNTING DOWN MISSING LIBS ==="
+          mkdir -p "$PREFIX/lib"
+          if [ -d "$PREFIX/lib64" ]; then
+            cp -a "$PREFIX/lib64/." "$PREFIX/lib/" 2>/dev/null || true
+          fi
+          
+
+          find "$PREFIX" -name "libaom*.a" -exec cp {} "$PREFIX/lib/libaom.a" \; 2>/dev/null || true
+          
+          # Brutální pojistka pro pkg-config (zkopíruje všechny .pc z celého prefixu přímo do lib/pkgconfig)
+          mkdir -p "$PREFIX/lib/pkgconfig"
+          find "$PREFIX" -name "*.pc" -exec cp {} "$PREFIX/lib/pkgconfig/" \; 2>/dev/null || true
+          
+
+
+          # Pojistka pro libaom (AV1), pokud by náhodou taky chyběl
+          if [ ! -f "$PREFIX/lib/pkgconfig/aom.pc" ]; then
+            echo "Vytvářím manuální aom.pc..."
+            echo "prefix=$PREFIX" > "$PREFIX/lib/pkgconfig/aom.pc"
+            echo "exec_prefix=\${prefix}" >> "$PREFIX/lib/pkgconfig/aom.pc"
+            echo "libdir=\${exec_prefix}/lib" >> "$PREFIX/lib/pkgconfig/aom.pc"
+            echo "includedir=\${prefix}/include" >> "$PREFIX/lib/pkgconfig/aom.pc"
+            echo "Name: aom" >> "$PREFIX/lib/pkgconfig/aom.pc"
+            echo "Description: Alliance for Open Media AV1 codec library" >> "$PREFIX/lib/pkgconfig/aom.pc"
+            echo "Version: 3.8.0" >> "$PREFIX/lib/pkgconfig/aom.pc"
+            echo "Libs: -L\${libdir} -laom -lm -pthread" >> "$PREFIX/lib/pkgconfig/aom.pc"
+            echo "Libs.private: -lm -pthread" >> "$PREFIX/lib/pkgconfig/aom.pc"
+            echo "Cflags: -I\${includedir}" >> "$PREFIX/lib/pkgconfig/aom.pc"
+          fi
+
+          echo "Obsah složky lib/pkgconfig před FFmpegiem:"
+          ls -lah "$PREFIX/lib/pkgconfig/"
+
+          echo "STEP FFmpeg"
+          cd "$SRC"
+          curl -L "https://ffmpeg.org/releases/ffmpeg-8.1.1.tar.xz" -o ff.tar.xz
+          tar xf ff.tar.xz
+          cd ffmpeg-8.1.1
+          
+          # [CRITICAL FIX ENHANCED FOR FFmpeg 8.x]
+          sed -i 's/char thread_local/disabled_thread_local/g' configure
+          sed -i 's/char _Thread_local/disabled_Thread_local/g' configure
+          sed -i 's/inline _Thread_local/inline disabled_Thread_local/g' configure
+          
+          export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig:$PREFIX/share/pkgconfig:$PKG_CONFIG_PATH"
+          export PKG_CONFIG_LIBDIR="$PREFIX/lib/pkgconfig"
+
+          ./configure \
+            --prefix="$OUTPUT" \
+            --target-os=android \
+            --arch="$ARCH" \
+            --cpu="$CPU" \
+            --sysroot="$SYSROOT" \
+            --cc="$CC" --cxx="$CXX" \
+            --ar="$AR" --as="$AS" --nm="$NM" \
+            --strip="$STRIP" --ranlib="$RANLIB" \
+            --enable-cross-compile \
+            --enable-static --disable-shared --enable-pic \
+            --pkg-config-flags="--static" \
+            --disable-programs --disable-doc --disable-avdevice \
+            --enable-jni --enable-mediacodec \
+            --enable-hwaccels \
+            --enable-static --disable-shared \
+            --enable-libopus --enable-libaom \
+            --enable-libdav1d \
+            --enable-libsvtav1 \
+            --enable-libmp3lame \
+            --enable-hwaccel=h264_mediacodec \
+            --enable-hwaccel=hevc_mediacodec \
+            --enable-hwaccel=vp9_mediacodec \
+            --enable-hwaccel=vp8_mediacodec \
+            --enable-hwaccel=mpeg4_mediacodec \
+            --enable-hwaccel=mpeg2_mediacodec \
+            --enable-hwaccel=vc1_mediacodec \
+            --enable-hwaccel=av1_mediacodec \
+            --enable-decoder=h264_mediacodec \
+            --enable-decoder=hevc_mediacodec \
+            --enable-decoder=vp9_mediacodec \
+            --enable-decoder=vp8_mediacodec \
+            --enable-decoder=mpeg4_mediacodec \
+            --enable-decoder=mpeg2_mediacodec \
+            --enable-decoder=vc1_mediacodec \
+            --enable-decoder=av1_mediacodec \
+            --enable-encoder=h264_mediacodec \
+            --enable-encoder=hevc_mediacodec \
+            --enable-encoder=vp9_mediacodec \
+            --enable-encoder=vp8_mediacodec \
+            --enable-encoder=mpeg4_mediacodec \
+            --enable-encoder=av1_mediacodec \
+            --enable-decoder=h264 --enable-decoder=hevc \
+            --enable-decoder=vp8 --enable-decoder=vp9 --enable-decoder=av1 \
+            --enable-decoder=mpeg4 --enable-decoder=mpeg2video --enable-decoder=mpeg1video \
+            --enable-decoder=msmpeg4v1 --enable-decoder=msmpeg4v2 --enable-decoder=msmpeg4v3 \
+            --enable-decoder=rv10 --enable-decoder=rv20 --enable-decoder=rv30 --enable-decoder=rv40 \
+            --enable-decoder=theora --enable-decoder=wmv1 --enable-decoder=wmv2 --enable-decoder=wmv3 \
+            --enable-decoder=vc1 \
+            --enable-decoder=prores --enable-decoder=dnxhd --enable-decoder=huffyuv \
+            --enable-decoder=ffv1 --enable-decoder=mjpeg --enable-decoder=png \
+            --enable-decoder=gif --enable-decoder=webp --enable-decoder=bmp --enable-decoder=tiff \
+            --enable-decoder=flac --enable-decoder=mp3 --enable-decoder=aac \
+            --enable-decoder=ac3 --enable-decoder=eac3 --enable-decoder=dca \
+            --enable-decoder=truehd --enable-decoder=opus --enable-decoder=vorbis \
+            --enable-decoder=alac --enable-decoder=ape --enable-decoder=pcm_s16le \
+            --enable-decoder=pcm_s24le --enable-decoder=pcm_s32le --enable-decoder=pcm_f32le \
+            --enable-decoder=wmaudio1 --enable-decoder=wmaudio2 --enable-decoder=wmapro \
+            --enable-decoder=amrnb --enable-decoder=amrwb --enable-decoder=speex --enable-decoder=gsm \
+            --enable-decoder=ssa --enable-decoder=ass --enable-decoder=srt \
+            --enable-decoder=subrip --enable-decoder=webvtt --enable-decoder=pgssub \
+            --enable-decoder=dvbsub --enable-decoder=dvdsub --enable-decoder=cc_dec \
+            --enable-muxer=mp4 --enable-muxer=mov --enable-muxer=matroska \
+            --enable-muxer=webm --enable-muxer=mpegts --enable-muxer=ogg \
+            --enable-muxer=adts --enable-muxer=mp3 --enable-muxer=wav \
+            --enable-muxer=nut --enable-muxer=avi --enable-muxer=flv \
+            --enable-muxer=flac --enable-muxer=webvtt --enable-muxer=srt \
+            --enable-muxer=ass --enable-muxer=mxf --enable-muxer=asf \
+            --enable-muxer=image2 --enable-muxer=rawvideo \
+            --enable-muxer=gif --enable-muxer=webp --enable-muxer=h264 --enable-muxer=hevc \
+            --enable-demuxer=matroska --enable-demuxer=mov --enable-demuxer=avi \
+            --enable-demuxer=mpegts --enable-demuxer=ogg --enable-demuxer=wav \
+            --enable-demuxer=flac --enable-demuxer=mp3 --enable-demuxer=aac \
+            --enable-demuxer=flv --enable-demuxer=asf --enable-demuxer=rm \
+            --enable-demuxer=ass --enable-demuxer=srt --enable-demuxer=webvtt \
+            --enable-demuxer=rawvideo --enable-demuxer=image2 \
+            --enable-demuxer=mxf --enable-demuxer=h264 --enable-demuxer=hevc \
+            --enable-demuxer=gif --enable-demuxer=webp --enable-demuxer=amr \
+            --enable-parser=h264 --enable-parser=hevc \
+            --enable-parser=vp8 --enable-parser=vp9 --enable-parser=av1 \
+            --enable-parser=aac --enable-parser=ac3 --enable-parser=mpegaudio \
+            --enable-parser=opus --enable-parser=flac --enable-parser=vorbis \
+            --enable-parser=mpeg4video --enable-parser=mpegvideo \
+            --enable-parser=png --enable-parser=mjpeg --enable-parser=webp \
+            --enable-parser=h263 --enable-parser=dca --enable-parser=bmp \
+            --enable-parser=vc1 \
+            --enable-filter=subtitles --enable-filter=ass \
+            --enable-filter=drawtext \
+            --enable-filter=overlay --enable-filter=scale \
+            --enable-filter=pad --enable-filter=crop \
+            --enable-filter=hflip --enable-filter=vflip \
+            --enable-filter=rotate --enable-filter=transpose \
+            --enable-filter=fps --enable-filter=setpts \
+            --enable-filter=trim --enable-filter=concat \
+            --enable-filter=format --enable-filter=null \
+            --enable-filter=split --enable-filter=copy \
+            --enable-filter=xfade \
+            --enable-filter=blend \
+            --enable-filter=lut --enable-filter=lutrgb \
+            --enable-filter=lut3d --enable-filter=haldclut \
+            --enable-filter=colorbalance --enable-filter=colormatrix \
+            --enable-filter=colorchannelmixer \
+            --enable-filter=eq --enable-filter=curves \
+            --enable-filter=zscale \
+            --enable-filter=colorspace \
+            --enable-filter=unsharp \
+            --enable-filter=nlmeans \
+            --enable-filter=hqdn3d \
+            --enable-filter=yadif \
+            --enable-filter=vignette \
+            --enable-filter=chromakey --enable-filter=colorkey \
+            --enable-filter=drawbox --enable-filter=delogo \
+            --enable-filter=deflicker \
+            --enable-filter=boxblur --enable-filter=gblur \
+            --enable-filter=volume --enable-filter=amix \
+            --enable-filter=aresample --enable-filter=atrim \
+            --enable-filter=asetpts --enable-filter=aecho \
+            --enable-filter=loudnorm \
+            --enable-filter=compand \
+            --enable-filter=atempo \
+            --enable-filter=equalizer --enable-filter=firequalizer \
+            --enable-filter=amerge --enable-filter=channelsplit \
+            --enable-filter=agate --enable-filter=alimiter \
+            --enable-filter=anull \
+            --enable-protocol=file --enable-protocol=pipe --enable-protocol=data \
+            --enable-protocol=http --enable-protocol=hls --enable-protocol=dash --enable-protocol=rtmp \
+            --extra-cflags="-O3 -fPIC -fno-stack-protector -ftls-model=global-dynamic -femulated-tls -I$PREFIX/include -I$PREFIX/include/freetype2 -I$PREFIX/include/harfbuzz -I$PREFIX/include/fribidi" \
+            --extra-ldflags="-L$PREFIX/lib -L$NDK_LIBCXX_BASE -Wl,-z,max-page-size=16384 -femulated-tls -Wl,--build-id=sha1" \
+            --extra-libs="-lass -lharfbuzz -lfreetype -lfribidi -laom -ldav1d -lSvtAv1Enc -lopus -lmp3lame -lvpx -lm -lc++_shared -lz -ldl" \
+            --pkg-config=pkg-config || { echo "=== FFMPEG CONFIGURE ERROR LOG ==="; cat ffbuild/config.log; exit 1; }
+          make -j"$(nproc)"
+          make install
+          echo "FFmpeg install done"
+          ls -lah "$OUTPUT/lib/"
+
+          echo "=== Static Libs Built ==="
+          ls -lah "$OUTPUT/lib/"
+
+      - name: Stage final SDK (Libs + Includes)
+        shell: bash
+        env:
+          ABI: ${{ matrix.abi }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          STAGE="$GITHUB_WORKSPACE/stage/$ABI"
+          mkdir -p "$STAGE/libs"
+          mkdir -p "$STAGE/include"
+          
+          echo "=== Zkopírování všech vytvořených statických knihoven ==="
+          # Najde VŠECHNY .a soubory ve složkách prebuilt i output a hodí je do libs
+          find "$GITHUB_WORKSPACE/prebuilt/$ABI" -name "*.a" -exec cp -v {} "$STAGE/libs/" \;
+          find "$GITHUB_WORKSPACE/output/$ABI" -name "*.a" -exec cp -v {} "$STAGE/libs/" \;
+          
+          # Zkopírujeme i libc++_shared.so
+          NDK_LIBCXX="${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/${TARGET}/libc++_shared.so"
+          cp -av "$NDK_LIBCXX" "$STAGE/libs/"
+          
+          echo "=== Zkopírování hlaviček ==="
+          cp -rv "$GITHUB_WORKSPACE/output/$ABI/include/"* "$STAGE/include/" 2>/dev/null || true
+          cp -rv "$GITHUB_WORKSPACE/prebuilt/$ABI/include/"* "$STAGE/include/" 2>/dev/null || true
+          
+          echo "Final SDK for $ABI staged."
+          ls -lh "$STAGE/libs/"
+
+      - name: Upload ABI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-${{ matrix.abi }}
+          path: stage/${{ matrix.abi }}/
+
+  package:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare SDK tree
+        run: |
+          mkdir -p sdk/jniLibs/arm64-v8a
+          mkdir -p sdk/jniLibs/x86_64
+          mkdir -p sdk/include/arm64-v8a
+          mkdir -p sdk/include/x86_64
+
+      - name: Download arm64-v8a
+        uses: actions/download-artifact@v4
+        with:
+          name: ffmpeg-arm64-v8a
+          path: tmp/arm64-v8a
+
+      - name: Download x86_64
+        uses: actions/download-artifact@v4
+        with:
+          name: ffmpeg-x86_64
+          path: tmp/x86_64
+
+      - name: Organize SDK
+        run: |
+          cp -rv tmp/arm64-v8a/libs/* sdk/jniLibs/arm64-v8a/
+          cp -rv tmp/arm64-v8a/include/* sdk/include/arm64-v8a/
+          cp -rv tmp/x86_64/libs/* sdk/jniLibs/x86_64/
+          cp -rv tmp/x86_64/include/* sdk/include/x86_64/
+
+      - name: Verify SDK contents
+        run: |
+          set -e
+          echo "arm64-v8a libs:"
+          ls -lh sdk/jniLibs/arm64-v8a/
+          echo "arm64-v8a includes:"
+          ls sdk/include/arm64-v8a/ | head -n 5
+          
+          fail=0
+          for abi in arm64-v8a x86_64; do
+            for lib in libass.a libavcodec.a libavfilter.a libavformat.a libavutil.a \
+                       libswscale.a libswresample.a libc++_shared.so \
+                       libfreetype.a libfribidi.a libharfbuzz.a libopus.a \
+                       libaom.a libdav1d.a libSvtAv1Enc.a; do
+              if ls sdk/jniLibs/$abi/${lib} >/dev/null 2>&1; then
+                echo "OK $abi/$lib"
+              else
+                echo "MISSING $abi/$lib"
+                fail=1
+              fi
+            done
+          done
+          exit $fail
+
+      - name: Zip SDK
+        run: zip -r enterprise-ffmpeg-android-sdk.zip sdk
+
+      - name: Upload SDK
+        uses: actions/upload-artifact@v4
+        with:
+          name: enterprise-ffmpeg-android-sdk
+          path: enterprise-ffmpeg-android-sdk.zip

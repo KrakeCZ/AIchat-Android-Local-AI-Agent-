@@ -1,0 +1,43 @@
+{
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target",
+			"ExternalProject_Add"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt",
+			"C:/SS24_V3_OK_preAgent_/examples/llama.android/lib/src/main/cpp/whisper.cpp/ggml/src/ggml-vulkan/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 149,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 52,
+				"parent" : 1
+			}
+		]
+	},
+	"id" : "vulkan-shaders-gen::@af61c0246c614116d586",
+	"name" : "vulkan-shaders-gen",
+	"paths" : 
+	{
+		"build" : "build-whisper/ggml/src/ggml-vulkan",
+		"source" : "C:/SS24_V3_OK_preAgent_/examples/llama.android/lib/src/main/cpp/whisper.cpp/ggml/src/ggml-vulkan"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}

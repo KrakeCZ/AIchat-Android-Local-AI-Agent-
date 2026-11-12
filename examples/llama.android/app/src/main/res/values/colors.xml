@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="copy_button_tint">#6c6c6c</color>
+    
+    <!-- Prism: Global Fail-Safe Text -->
+    <color name="prism_code_text_safe">#D2D2D2</color>
+
+    <!-- Prism: Default -->
+    <color name="prism_default_bg">#f1f1f1</color>
+    <color name="prism_default_text">#000000</color>
+    <color name="prism_default_comment">#708090</color>
+    <color name="prism_default_punctuation">#999999</color>
+    <color name="prism_default_property">#905</color>
+    <color name="prism_default_selector">#690</color>
+    <color name="prism_default_string">#690</color>
+    <color name="prism_default_keyword">#07a</color>
+    <color name="prism_default_function">#DD4A68</color>
+    <color name="prism_default_variable">#e90</color>
+
+    <!-- Prism: Dark (Material) -->
+    <color name="prism_dark_bg">#212121</color>
+    <color name="prism_dark_text">#EEFFFF</color>
+    <color name="prism_dark_comment">#808080</color>
+    <color name="prism_dark_green">#a5d6a7</color>
+    <color name="prism_dark_blue">#90caf9</color>
+    <color name="prism_dark_purple">#ce93d8</color>
+    <color name="prism_dark_orange">#ffcc80</color>
+    <color name="prism_dark_cyan">#80deea</color>
+    <color name="prism_dark_red">#ff8a80</color>
+
+    <!-- Prism: Okaidia -->
+    <color name="prism_okaidia_bg">#272822</color>
+    <color name="prism_okaidia_text">#f8f8f2</color>
+    <color name="prism_okaidia_grey">#8292a2</color>
+    <color name="prism_okaidia_pink">#f92672</color>
+    <color name="prism_okaidia_purple">#ae81ff</color>
+    <color name="prism_okaidia_green">#a6e22e</color>
+    <color name="prism_okaidia_yellow">#e6db74</color>
+    <color name="prism_okaidia_blue">#66d9ef</color>
+    <color name="prism_okaidia_orange">#fd971f</color>
+
+    <!-- Prism: Twilight -->
+    <color name="prism_twilight_bg">#141414</color>
+    <color name="prism_twilight_text">#f7f7f7</color>
+    <color name="prism_twilight_grey">#777777</color>
+    <color name="prism_twilight_red">#cf6a4c</color>
+    <color name="prism_twilight_yellow">#f9ee98</color>
+    <color name="prism_twilight_green">#8f9d6a</color>
+    <color name="prism_twilight_orange">#cda869</color>
+    <color name="prism_twilight_blue">#7587a6</color>
+    <color name="prism_twilight_punctuation">#dddddd</color>
+
+    <!-- Prism: Dracula -->
+    <color name="prism_dracula_bg">#282a36</color>
+    <color name="prism_dracula_text">#f8f8f2</color>
+    <color name="prism_dracula_comment">#6272a4</color>
+    <color name="prism_dracula_pink">#ff79c6</color>
+    <color name="prism_dracula_purple">#bd93f9</color>
+    <color name="prism_dracula_cyan">#8be9fd</color>
+    <color name="prism_dracula_green">#50fa7b</color>
+    <color name="prism_dracula_yellow">#f1fa8c</color>
+
+    <!-- Prism: Solarized Light -->
+    <color name="prism_solarized_bg">#fdf6e3</color>
+    <color name="prism_solarized_text">#657b83</color>
+    <color name="prism_solarized_base01">#586e75</color>
+    <color name="prism_solarized_yellow">#b58900</color>
+    <color name="prism_solarized_orange">#cb4b16</color>
+    <color name="prism_solarized_red">#dc322f</color>
+    <color name="prism_solarized_magenta">#d33682</color>
+    <color name="prism_solarized_violet">#6c71c4</color>
+    <color name="prism_solarized_blue">#268bd2</color>
+    <color name="prism_solarized_cyan">#2aa198</color>
+    <color name="prism_solarized_green">#859900</color>
+
+    <!-- Prism: Terminal 90s -->
+    <color name="prism_terminal_bg">#000000</color>
+    <color name="prism_terminal_green">#299617</color>
+    <color name="prism_terminal_bright_green">#00FF00</color>
+    <color name="prism_terminal_dark_green">#11440b</color>
+    <color name="prism_terminal_text_dim">#7E7E7E</color>
+
+    <!-- Prism: Coy -->
+    <color name="prism_coy_bg">#fdfdfd</color>
+    <color name="prism_coy_text">#000000</color>
+    <color name="prism_coy_comment">#7d8b99</color>
+    <color name="prism_coy_grey">#7d8b99</color>
+    <color name="prism_coy_blue">#2f9c0a</color> <!-- Actually green in standard Coy for some tokens, referencing standard -->
+    <color name="prism_coy_green">#2f9c0a</color>
+    <color name="prism_coy_number_bool">#c92c2c</color>
+    <color name="prism_coy_keyword">#2f9c0a</color>
+    <color name="prism_coy_operator">#a67f59</color>
+    <color name="prism_coy_string">#2f9c0a</color>
+    <color name="prism_coy_function">#c92c2c</color>
+    <color name="prism_coy_border">#e0e6ed</color>
+    <color name="prism_coy_shadow">#f5f2f0</color>
+
+    <!-- Prism: Funky -->
+    <color name="prism_funky_bg">#222222</color> <!-- Technically defined as #222 or striped logic, using solid approximation -->
+    <color name="prism_funky_text">#ddd</color>
+    <color name="prism_funky_comment">#aaa</color>
+    <color name="prism_funky_pink">#d32578</color>
+    <color name="prism_funky_blue">#1977d2</color>
+    <color name="prism_funky_orange">#d17b0e</color>
+    <color name="prism_funky_yellow">#ffff00</color>
+    <color name="prism_funky_green">#34be5b</color>
+    <color name="prism_funky_purple">#990099</color>
+
+    <!-- Prism: Tomorrow Night -->
+    <color name="prism_tomorrow_bg">#2d2d2d</color>
+    <color name="prism_tomorrow_text">#cccccc</color>
+    <color name="prism_tomorrow_comment">#999999</color>
+    <color name="prism_tomorrow_red">#e2777a</color>
+    <color name="prism_tomorrow_orange">#f08d49</color>
+    <color name="prism_tomorrow_yellow">#f8c555</color>
+    <color name="prism_tomorrow_green">#7ec699</color>
+    <color name="prism_tomorrow_blue">#6196cc</color>
+    <color name="prism_tomorrow_purple">#cc99cd</color>
+    <color name="prism_tomorrow_aqua">#67cdcc</color>
+</resources>

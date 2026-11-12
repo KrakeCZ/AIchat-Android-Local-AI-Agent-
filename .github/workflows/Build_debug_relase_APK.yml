@@ -1,0 +1,153 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - 'examples/llama.android/**'
+      - '.github/workflows/**'
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ "main", "master" ]
+    paths:
+      - 'examples/llama.android/**'
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Typ sestavení (debug / release / both)'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - debug
+          - release
+          - both
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build APK (${{ github.event.inputs.build_type || 'both' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+
+    defaults:
+      run:
+        working-directory: examples/llama.android
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: recursive
+          lfs: true
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Set up Android NDK r29
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r29
+          add-to-path: true
+          link-to-sdk: true
+
+      - name: Configure Android SDK & NDK Links
+        run: |
+          NDK_PATH="${{ steps.setup-ndk.outputs.ndk-path }}"
+          echo "Používám NDK z: $NDK_PATH"
+
+          # 1. Detekce přesné verze staženého NDK na CI runneru (např. 29.0.14206865)
+          NDK_VER=$(grep -i '^Pkg.Revision' "$NDK_PATH/source.properties" | cut -d'=' -f2 | tr -d ' ' | cut -d'-' -f1)
+          echo "Detekovaná verze NDK na CI: $NDK_VER"
+
+          # 2. Vytvoření symlinků v SDK pro obě verze
+          mkdir -p "$ANDROID_HOME/ndk"
+          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/$NDK_VER"
+          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/29.0.13846066"
+          ln -sfn "$NDK_PATH" "$ANDROID_HOME/ndk/29.0.13846066 rc3"
+
+          # 3. Dynamické sjednocení ndkVersion v Gradle modulech s verzí na CI runneru
+          sed -i "s/ndkVersion = .*/ndkVersion = \"$NDK_VER\"/g" app/build.gradle.kts
+          sed -i "s/ndkVersion = .*/ndkVersion = \"$NDK_VER\"/g" lib/build.gradle.kts
+          sed -i "s/ndkVersion = .*/ndkVersion = \"$NDK_VER\"/g" whisper/build.gradle.kts
+
+          # 4. Vyčistit a správně nastavit local.properties
+          rm -f local.properties lib/local.properties whisper/local.properties app/local.properties
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          echo "ndk.dir=$NDK_PATH" >> local.properties
+
+          # 5. Export proměnných pro následující kroky a CMake
+          echo "ANDROID_NDK_HOME=$NDK_PATH" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$NDK_PATH" >> $GITHUB_ENV
+          echo "ANDROID_NDK=$NDK_PATH" >> $GITHUB_ENV
+
+      - name: Patch CI Configuration & Memory Limits
+        run: |
+          echo "Optimalizace gradle.properties a CMake pro CI runner (7GB RAM)..."
+          # 1. Odstranit lokální Windows cesty na Android Studio JBR
+          sed -i '/org.gradle.java.installations.paths/d' gradle.properties
+
+          # 2. Upravit limity RAM pro GitHub Actions runner (prevence OOM killeru)
+          sed -i 's/-Xmx10g/-Xmx4096m/g' gradle.properties
+          sed -i 's/-Xmx6g/-Xmx2048m/g' gradle.properties
+          sed -i 's/org.gradle.workers.max=4/org.gradle.workers.max=2/g' gradle.properties
+
+          # 3. Odstranit IDE specifický daemon JVM soubor, aby Gradle použil nainstalovaný JDK 21
+          rm -f gradle/gradle-daemon-jvm.properties
+
+          # 4. Nahradit Windows cestu k shader kompilátoru glslc v whisper CMakeLists na systémový NDK glslc
+          if [ -f "whisper/src/main/cpp/CMakeLists.txt" ]; then
+            sed -i 's|set(Vulkan_GLSLC_EXECUTABLE "C:/.*glslc\.exe".*)|set(Vulkan_GLSLC_EXECUTABLE "$ENV{ANDROID_NDK_HOME}/shader-tools/linux-x86_64/glslc" CACHE FILEPATH "Path to glslc")|g' whisper/src/main/cpp/CMakeLists.txt
+          fi
+
+      - name: Download AI Models for Assets Check
+        run: |
+          chmod +x scripts/download_models.sh
+          ./scripts/download_models.sh
+
+      - name: Grant Execute Permission for Gradlew
+        run: chmod +x gradlew
+
+      - name: Build APK with Gradle
+        env:
+          BUILD_TYPE: ${{ github.event.inputs.build_type || 'both' }}
+        run: |
+          echo "Spouštím kompilaci APK ($BUILD_TYPE)..."
+          if [ "$BUILD_TYPE" = "release" ]; then
+            ./gradlew assembleRelease --stacktrace
+          elif [ "$BUILD_TYPE" = "debug" ]; then
+            ./gradlew assembleDebug --stacktrace
+          else
+            # Sestavit Debug i Release (pokud release nemá podpis, fallback na debug)
+            ./gradlew assembleDebug assembleRelease --stacktrace || ./gradlew assembleDebug --stacktrace
+          fi
+
+      - name: Upload APK Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: AI-Chat-Android-APKs
+          path: examples/llama.android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.0.01' }}
+          name: "AI Chat Android Release ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.0.01' }}"
+          files: |
+            examples/llama.android/app/build/outputs/apk/**/*.apk
+          generate_release_notes: true
+          make_latest: true

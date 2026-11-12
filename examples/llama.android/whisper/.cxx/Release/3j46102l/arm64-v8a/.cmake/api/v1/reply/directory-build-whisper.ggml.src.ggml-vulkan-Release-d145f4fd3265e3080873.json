@@ -1,0 +1,53 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install",
+			"ggml_add_backend_library"
+		],
+		"files" : 
+		[
+			"C:/SS24_V3_OK_preAgent_/examples/llama.android/lib/src/main/cpp/whisper.cpp/ggml/src/CMakeLists.txt",
+			"C:/SS24_V3_OK_preAgent_/examples/llama.android/lib/src/main/cpp/whisper.cpp/ggml/src/ggml-vulkan/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 57,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 262,
+				"parent" : 1
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"build-whisper/ggml/src/ggml-vulkan/libggml-vulkan.a"
+			],
+			"targetId" : "ggml-vulkan::@af61c0246c614116d586",
+			"targetIndex" : 3,
+			"type" : "target"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "build-whisper/ggml/src/ggml-vulkan",
+		"source" : "C:/SS24_V3_OK_preAgent_/examples/llama.android/lib/src/main/cpp/whisper.cpp/ggml/src/ggml-vulkan"
+	}
+}

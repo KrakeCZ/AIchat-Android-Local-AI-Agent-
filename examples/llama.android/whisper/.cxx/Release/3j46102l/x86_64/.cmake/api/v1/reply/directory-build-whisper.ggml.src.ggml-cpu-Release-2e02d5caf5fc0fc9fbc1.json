@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "build-whisper/ggml/src/ggml-cpu",
+		"source" : "C:/SS24_V3_OK_preAgent_/examples/llama.android/lib/src/main/cpp/whisper.cpp/ggml/src/ggml-cpu"
+	}
+}

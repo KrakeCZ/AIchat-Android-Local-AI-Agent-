@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- NLP Engine ChipGroup — SRT Editor Panel 5 -->
+    <item name="chip_srt_engine_auto"   type="id" />
+    <item name="chip_srt_engine_mlkit"  type="id" />
+    <item name="chip_srt_engine_aicore" type="id" />
+    <item name="chip_srt_engine_heur"   type="id" />
+    <item name="chip_srt_engine_llama"  type="id" />
+
+    <!-- NLP Engine ChipGroup — Audio Studio -->
+    <item name="chip_studio_nlp_auto"   type="id" />
+    <item name="chip_studio_nlp_mlkit"  type="id" />
+    <item name="chip_studio_nlp_aicore" type="id" />
+    <item name="chip_studio_nlp_heur"   type="id" />
+    <item name="chip_studio_nlp_llama"  type="id" />
+</resources>

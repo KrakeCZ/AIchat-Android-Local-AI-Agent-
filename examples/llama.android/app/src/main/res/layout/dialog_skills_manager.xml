@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#1A1A1A">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🧠 Agent Skills &amp; Prompt Engineering"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Specializované dovednosti pro lokální LLM agenta (Markdown + YAML)"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp" />
+
+    <!-- Active Mode Selector -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="8dp"
+        android:background="#242424"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Aktivní v chatu:"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp" />
+
+        <Spinner
+            android:id="@+id/spinner_active_skill"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@android:color/white" />
+    </LinearLayout>
+
+    <!-- Skills List Container -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:maxHeight="420dp"
+        android:fadeScrollbars="false">
+
+        <LinearLayout
+            android:id="@+id/container_skills_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <!-- Bottom Actions -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="12dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_create_skill"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="+ Vytvořit nový Skill"
+            android:textColor="#00E676"
+            app:strokeColor="#00E676" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_close_skills"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Zavřít" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,146 @@
+# 🦙 Android Local AI 
+OPEN-SOURCE/ MIT license ..
+
+** ENCYKLOPEDIA OF CODE ** 👇💻📲📚
+https://krakecz.github.io/AIchat-Android-Local-AI-Agent-/
+
+examples/llama.android PATH of 
+ local AI for android here 👇
+
+https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/tree/main/examples/llama.android
+
+early-access -> really early.. 
+kotlin layer find here👇
+https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/tree/main/examples/llama.android/app/src/main/java/com/example/llama
+
+**************************************************************************************************************
+**************************************************************************************************************
+
+Upstream and attribution
+
+AIchat is an independent experimental Android application built on top of the open-source llama.cpp ecosystem.
+
+This repository includes a modified copy of llama.cpp and its Android integration, along with additional Android components, native integrations, and application-specific modules.
+
+The full source tree is retained because some AIchat components depend on shared native libraries, build infrastructure, and code outside the Android example directory.
+
+AIchat is **not** an official llama.cpp release or an officially supported upstream application.
+
+👉🌐 Original llama.cpp project: https://github.com/ggml-org/llama.cpp 🌐 👈
+
+Original copyright notices and applicable third-party licenses are preserved.
+
+An advanced, fully on-device AI Agent for Android. This application acts as a smart accessibility layer, understanding your screen context, listening to voice commands, and executing autonomous actions—all processed locally without sending your private data to the cloud.
+
+**************************************************************************************************************
+**************************************************************************************************************
+
+[![Platform: Android](https://img.shields.io/badge/Platform-Android-green.svg)](https://android.com)
+[![Offline First](https://img.shields.io/badge/Offline-100%25-blue.svg)](#privacy)
+[![Build Android APK](https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/actions/workflows/Build_debug_relase_APK.yml/badge.svg)](https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/actions/workflows/Build_debug_relase_APK.yml)
+
+Android local AI Agent is a comprehensive, open-source assistive platform for Android that runs entirely locally without the need for cloud connectivity [1]. The application combines the power of local LLMs (Large Language Models), Computer Vision, audio processing, and advanced eye tracking (IrisMotion) to enable fully autonomous and hands-free device control [2, 3] in build.. **NOT AUTONOMOUS**
+​The project is designed as an "Assistive Technology" and places absolute emphasis on user data security. 
+APP USE INTERNET FOR LLM_CHAT_TOOLS [web_browser, web_search, read_url_context, download one time ML Kit 30MB vocab] 
+
+## ✨ Main Function (Core Features)
+
+### 🧠 Here is the translation of your README into English, keeping the formatting clean and suited for GitHub/F-Droid.
+An advanced, fully on-device AI Agent for Android. This application acts as a smart accessibility layer, understanding your screen context, listening to voice commands, and executing autonomous actions—all processed locally without sending your private data to the cloud.
+Platform: Android
+
+Offline First
+[LLM can use tools for web_search & web_browser & read_url_context] 
+ml_kist for translate use one time download 30MB vocabulary > sending telemetry blocked in manifest
+
+F-Droid Compatible
+**Android AI Agent** is a comprehensive, open-source assistive platform for Android that runs entirely locally without the need for cloud connectivity [1]. The application combines the power of local LLMs (Large Language Models), Computer Vision, audio processing, and advanced eye tracking (IrisMotion) to enable fully autonomous and hands-free device control [2, 3].
+The project is designed as an "Assistive Technology" and places absolute emphasis on user data security. It contains no trackers and is an ideal candidate for distribution via F-Droid [1, 4].
+## ✨ Core Features
+
+### 🧠 Tri-Modal Hybrid Inference & Hardware Security (BYOK)
+ * **Detailed Architecture Document:** See [HYBRID_INFERENCE_SECURITY.md](examples/llama.android/docs/HYBRID_INFERENCE_SECURITY.md) for full deep-dive.
+ * **Llama.cpp Integration (Mode 1):** Support for GGUF models running locally on CPU/NPU using the llama.cpp JNI layer [5] with strict 16 KB memory page alignment for Android 15/16.
+ * **Cloud BYOK API (Mode 2):** High-speed streaming inference via Google AI Studio (Gemini 2.5 Flash/Pro) and OpenAI-compatible endpoints (Groq, DeepSeek, OpenRouter) with multi-turn tool calling.
+ * **Local PC / Private LAN Server (Mode 3):** Connect directly to private home workstations running Ollama or llama-server over Wi-Fi (`192.168.x.x:11434/v1`) with zero data leaving your local network.
+ * **Hardware-Backed Key Vault:** API keys protected by Android Keystore (StrongBox Keymint / TEE), `FLAG_SECURE` anti-screenshot, `accessibilityDataSensitive` (Android 14+), zero-RAM leakage, and `BiometricPrompt` authorization.
+ * **Offline ML Kit Translation:** Bidirectional on-device translation preserving full Markdown syntax (code blocks, tables, lists) and model reasoning (`<think>`).
+ * **Cascading Fallback:** Support for MediaPipe LLM (LiteRT bundle) and Google AICore (Gemini Nano) models as fallbacks for devices with varying hardware capabilities [7, 8].
+ * **Multimodality:** The agent can process visual inputs (screen captures or live camera feed) using visual models [5, 9].
+### 👁️ IrisMotion (Hands-Free Eye Control)👇
+https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-/tree/main/examples/llama.android/app/src/main/java/com/example/llama/agent/irismotion
+
+ * **„No expensive eye tracker. Just an Android phone and its selfie camera.“ **
+ * ** I started IrisMotion because I believe nobody should need an expensive device just to try controlling a screen with their eyes. It's free, open-source, and designed to work with ordinary Android phones. I'm looking for developers and accessibility testers to help make it better!**
+ * 
+ * **Precise Gaze Tracking:** Utilizes MediaPipe Face Mesh to calculate an accurate gaze vector using 3D inverse kinematics and neural Blendshapes [10, 11].
+ * **6DoF Support:** Supports cursor movement not only through rotation but also head translation (Yaw, Pitch, Roll, X, Y, Z translation) [12].
+ * **Dwell & Blink Clicking:** Autonomous clicking via stabilized staring (Dwell) or intentional blink detection (Blink Phase Detector) [13, 14].
+ * **Enterprise Filters:** Stabilization using Kalman filter (Zero-Lag), Alpha-Beta, and OneEuro filters to eliminate microsaccades [15-17].
+### 🦾 Autonomous Control and Automation
+ * **Screen Parsing:** The application scans the UI tree using the Accessibility API, extracts context (texts, buttons), and passes it to the AI [18].
+ * **Action Executor:** Based on the LLM's response, the agent performs gestures—ranging from semantic clicking and typing text to swipe gestures and smooth scrolling [19-21].
+ * **Macro Engine & Smart Clicks:** Support for complex scripts and autonomous element discovery (e.g., "like this") at runtime [22, 23].
+### 🗣️ Audio Studio and Transcription (STT & TTS)
+ * **Dual-Engine Transcription:** Integrates highly accurate Whisper.cpp models and fast Sherpa-ONNX (Streaming and Batch models) [24].
+ * **System Audio:** Ability to capture internal device audio (Android 14+) via MediaProjection without needing a microphone [25, 26].
+ * **SRT Editor / Voice Recorder:** A fully-featured tool for recording, transcribing into subtitles, and editing SRT/VTT blocks from media [27, 28].
+ * **Speech Synthesis:** Option to clone voices or use fluent offline TTS models (e.g., VITS, Matcha, ZipVoice) via Sherpa integration [29].
+### 🌍 Environmental Perception (Perception Matrix)
+ * **Image Processing:** Local Object Detection (EfficientDet-Lite0) and ML Kit OCR analyze what the rear camera sees or the screen content [30, 31].
+ * **Acoustic Analysis (YAMNet):** Continuous ambient listening (AudioSet with 521 classes) detecting dangerous situations like alarm sirens, screaming, or barking, and alerting the user [32, 33].
+## 🛡️ Privacy and Security
+The application operates at a sensitive system level (Accessibility Service) but applies a radical principle of data isolation:
+ * **No Cloud:** All inference (LLM, NLP, OCR, Object Detection) occurs exclusively on the device's CPU/NPU [1].
+ * **SafetyGuard (Sensitive Data Protection):** An integrated blacklist automatically blocks the agent and screen perception in banking apps, password fields, or sensitive UI dialogs [4].
+ * **Encrypted Storage:** Intermediate AI operation results and conversation histories are stored encrypted (AES-256-GCM/SIV) in a secure Keystore [34].
+## 🛠️ Architecture
+The project is built on a modern Android stack:
+ * **Language:** Kotlin (100% UI and logic), C++ (JNI integration into llama.cpp and Sherpa/Whisper) [35].
+ * **Processing:** Coroutines and Flow (Event-Driven architecture via PerceptionEventBus) [36].
+ * **UI:** Support for Markdown parsed by custom, fast native lexers (without Regex) for dozens of languages [37].
+ * **Compatibility:** Targeting SDK 35 (Android 15+ ready) with support for the max-page-size=16384 requirement [38, 39].
+## 📦 Installation
+The project is optimized for F-Droid. It contains no proprietary Google trackers (exclusively on-device ML Kit / LiteRT dependencies).
+ 1. Download the latest APK from Releases.
+ 2. For voice features, you will be prompted to download the required models (Whisper/Sherpa) in Settings [40, 41].
+ 3. For full autonomy, enable the application in **Android Settings -> Accessibility** [42].
+## 📜 Permissions
+For the assistant to function correctly, it may require (depending on which modules you enable):
+ * ACCESSIBILITY_SERVICE: Critical for screen reading, OS navigation, and hands-free touch simulation [1, 18].
+ * RECORD_AUDIO: For wake-word detection, STT commands, and YAMNet environmental analysis [32, 43].
+ * CAMERA: For the IrisMotion feature (Eye tracking via the front camera) and object detection [43].
+ * SYSTEM_ALERT_WINDOW / TYPE_ACCESSIBILITY_OVERLAY: To display a floating cursor (IrisMotion), notification bubbles, or smart subtitles across the system [44, 45].
+## 🤝 Contributing
+Contributions are welcome! Please check out our Issues and submit a Pull Request. We primarily focus on memory stability (C++ pointer leaks) and reducing thermal load (Thermal throttling optimization) when running heavy AI models [46, 47].
+## ⚖️ License
+This project is distributed under the [MIT / GPLv3] license *(fill in your preferred license for F-Droid)*. Llama.cpp, Sherpa, and other integrations are subject to their own open-source licenses.
+This agent operates primarily offline. 
+* **SafetyGuard**: Prevents the agent from interacting with sensitive apps (banking, password managers).
+* **Secure Storage**: NLP context cache is encrypted using AES-256-GCM via Android Keystore.
+* No root access is required. All actions utilize standard Android Accessibility and Intent APIs.
+
+## 🚀 Installation
+ Download full project repo and copilate /edit / try "code_vibe" custom function 
+
+### Option 1: Direct APK Download
+1. Go to the [Releases](../../releases) page.
+2. Download the latest `app-release.apk`.
+3. Install the APK on your Android device (Android 13+ recommended).
+
+
+## ⚙️ Setup & Permissions
+
+To function correctly, the AI Agent requires the following permissions:
+0. for install om Android 17 ui9 must turn play protect (after instal turn on) 
+1. **Accessibility Service**: Go to `Settings -> Accessibility -> AI Agent` and enable it. This is required to read screen context and perform clicks.
+2. **Display Over Other Apps**: Required for the floating Agent button and visual bounding-box overlays.
+3. **Microphone**: For voice commands and dictation features.
+4. **Virtual Keyboard**: Enable `HyperKeyboardService` in Android language settings to allow the agent to type text autonomously.
+
+## 🛠️ Building from Source
+
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-.git](https:/github.com/KrakeCZ/AIchat-Android-Local-AI-Agent-.git)
+

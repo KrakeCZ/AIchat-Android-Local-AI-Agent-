@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="10dp"
+    android:background="@android:color/transparent">
+
+    <!-- Ikona souboru -->
+    <ImageView
+        android:id="@+id/iv_recording_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_mic_24"
+        app:tint="#4CAF50"
+        android:padding="6dp"
+        android:background="#1A4CAF50"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Název souboru -->
+    <TextView
+        android:id="@+id/tv_recording_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="recording_001"
+        android:textColor="#FFFFFF"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/iv_recording_icon"
+        app:layout_constraintEnd_toStartOf="@id/btn_play_recording"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp" />
+
+    <!-- Metadata (typ, velikost) -->
+    <TextView
+        android:id="@+id/tv_recording_meta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="WAV · 512 KB"
+        android:textColor="#888888"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/iv_recording_icon"
+        app:layout_constraintEnd_toStartOf="@id/btn_play_recording"
+        app:layout_constraintTop_toBottomOf="@id/tv_recording_name"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="2dp" />
+
+    <!-- Datum -->
+    <TextView
+        android:id="@+id/tv_recording_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="28.04.2026 21:00"
+        android:textColor="#555555"
+        android:textSize="11sp"
+        app:layout_constraintStart_toEndOf="@id/iv_recording_icon"
+        app:layout_constraintEnd_toStartOf="@id/btn_play_recording"
+        app:layout_constraintTop_toBottomOf="@id/tv_recording_meta"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="4dp" />
+
+    <!-- Přehrát/zastavit -->
+    <ImageButton
+        android:id="@+id/btn_play_recording"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@android:drawable/ic_media_play"
+        android:background="@android:color/transparent"
+        app:tint="#4CAF50"
+        android:contentDescription="Přehrát"
+        app:layout_constraintEnd_toStartOf="@id/btn_transcribe_recording"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="4dp" />
+
+    <!-- Přepis → SRT Editor -->
+    <ImageButton
+        android:id="@+id/btn_transcribe_recording"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@android:drawable/ic_menu_edit"
+        android:background="@android:color/transparent"
+        app:tint="#2196F3"
+        android:contentDescription="Přepis do SRT"
+        app:layout_constraintEnd_toStartOf="@id/btn_delete_recording"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="4dp" />
+
+    <!-- Smazat -->
+    <ImageButton
+        android:id="@+id/btn_delete_recording"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:background="@android:color/transparent"
+        app:tint="#F44336"
+        android:contentDescription="Smazat"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Oddělovač -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="#1AFFFFFF"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

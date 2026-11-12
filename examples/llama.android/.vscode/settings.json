@@ -1,0 +1,5 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "cmake.sourceDirectory": "C:/SS24_V3_OK_preAgent_/examples/llama.android/lib/src/main/cpp",
+    "git.ignoreLimitWarning": true
+}

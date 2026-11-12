@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    app:cardBackgroundColor="#1E1E1E"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/btnClose"
+                android:layout_alignParentStart="true"
+                android:layout_marginEnd="8dp"
+                android:text="@string/model_info_title"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvTitle"
+                android:layout_toStartOf="@id/btnClose"
+                android:layout_alignParentStart="true"
+                android:layout_marginEnd="8dp"
+                android:text="@string/model_info_subtitle"
+                android:textColor="#888888"
+                android:textSize="12sp" />
+
+            <ImageButton
+                android:id="@+id/btnClose"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/desc_close"
+                android:src="@drawable/ic_stop_24"
+                app:tint="#888888" />
+        </RelativeLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fadeScrollbars="false">
+
+            <LinearLayout
+                android:id="@+id/infoContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Rows will be added dynamically here -->
+
+                <!-- Chat Template Section -->
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lbl_chat_template"
+                    android:textColor="#AAAAAA"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_template_box">
+
+                    <TextView
+                        android:id="@+id/tvTemplate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:padding="12dp"
+                        android:text="@string/lbl_template_placeholder"
+                        android:textColor="#CCCCCC"
+                        android:textSize="11sp" />
+                </HorizontalScrollView>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,2 @@
+#pragma code_page(65001)
+1 /* CREATEPROCESS_MANIFEST_RESOURCE_ID */ 24 /* RT_MANIFEST */ "C:/SS24_V3_OK_preAgent_/examples/llama.android/lib/src/main/cpp/whisper.cpp/ggml/src/ggml-vulkan/vulkan-shaders/build_native/CMakeFiles/vulkan-shaders-gen.dir/embed.manifest"

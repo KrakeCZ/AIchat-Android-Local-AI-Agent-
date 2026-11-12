@@ -1,0 +1,49 @@
+
+name: AIchat Developer Portal
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "examples/llama.android/**"
+      - "docs/aichat-portal/**"
+      - ".github/workflows/aichat-portal.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "aichat-portal-pages"
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          lfs: false
+          submodules: false
+
+      - name: Generate source index
+        run: python3 docs/aichat-portal/build_index.py
+
+      - name: Generate relationship graph
+        run: python3 docs/aichat-portal/build_graph.py
+
+      - name: Upload static website
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/aichat-portal
+
+      - name: Deploy GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
